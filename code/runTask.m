@@ -803,18 +803,66 @@ end
 % Instructions
 line1 = 'Good job! You have completed the first part of the task. Please feel free to take a five-minute break. .';
 line2 = '\n\n During the break, please sit quietly with your eyes remaining open.';
-line3 = '\n\n When you feel that you have had sufficient rest, feel free to press [space] continue the experiment.';
+line3 = '\n\n A video will be played during the break. It will stop after five minutes,'; 
+line4 = '\n\n after which you can resume the to the task. Feel free to press [space] to proceed to the video.';
 
 % Draw instructions
-DrawFormattedText(screen.win, [line1 line2 line3], 'center', 'center', screen.white);
+DrawFormattedText(screen.win, [line1 line2 line3 line4], 'center', 'center', screen.white);
 
 % Flip to the screen
 Screen('Flip', screen.win);
 
 KbStrokeWait;
 
+% play vid------------------
+
+% Get the duration for which the video should play (in seconds)
+playDuration = 300; % Change this to your desired duration
+
+% Get the movie file
+movieFile = 'C:/Users/Brain Yan/Downloads/galaxy.mp4'; 
+
+% Open the movie file with additional parameters
+async = 0;
+preloadSecs = 1;
+specialFlags1 = 0;
+pixelFormat = 4;
+maxNumberThreads = -1;
+movieOptions = [];
+
+movie = Screen('OpenMovie', screen.win, movieFile, async, preloadSecs, specialFlags1, pixelFormat, maxNumberThreads, movieOptions);
+
+
+% Start playback engine
+Screen('PlayMovie', movie, 1,1);
+
+% Get the start time
+startTime = GetSecs;
+
+% Loop the video until the time is up
+while (GetSecs - startTime) < playDuration
+    % Check for new frame
+    tex = Screen('GetMovieImage', screen.win, movie);
+    
+    % If there is a new frame, draw it
+    if tex > 0
+        Screen('DrawTexture', screen.win, tex);
+        Screen('Flip', screen.win);
+        Screen('Close', tex);
+    end
+end
+
+
+
+% Stop playback
+Screen('PlayMovie', movie, 0);
+
+% Close the movie
+Screen('CloseMovie', movie);
+% end of vid-----------
+
 % Instructions
-line = 'Ready? Press [space] to continue.';
+line = 'Ready? Press [space] to continue to the second part of the experiment.';
 
 % Draw instructions
 DrawFormattedText(screen.win, line, 'center', 'center', screen.white);
@@ -1141,16 +1189,32 @@ end
 filename = [dirToSave filename];
 save(filename,'taskNames')
 
-line2_1 = 'This is the end of this task experiment.';
-line2_2 = ' Press [space] to exit.';
+line1 = 'Great job! You have come to the last part of the experiment.';
+line2 = 'Before we proceed, please wait for the experimenter to set up the equipment for this part.';
+line3 = 'Please do not press any key unless instructed by the experimenter.';
 
 % Draw instructions
-DrawFormattedText(screen.win, [line2_1 line2_2], 'center', screen.screenYpixels * 0.25, screen.white);
+DrawFormattedText(screen.win, [line1 line2 line3], 'center', screen.screenYpixels * 0.25, screen.white);
 
 % Flip to the screen
 Screen('Flip', screen.win);
 
 % Press any key to continue
 KbStrokeWait;
+
+% Page for accidental pressing.
+line1 = 'BACK UP SLIDE FOR ACCIDENTS!';
+line2 = 'DO NOT PROCEED UNLESS INSTRUCTED SO!';
+
+% Draw instructions
+DrawFormattedText(screen.win, [line1 line2], 'center', screen.screenYpixels * 0.55, screen.white);
+
+% Flip to the screen
+Screen('Flip', screen.win);
+
+% Press any key to continue
+KbStrokeWait;
+
+% Instructions for recall
 
 sca;

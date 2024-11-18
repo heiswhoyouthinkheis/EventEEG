@@ -1,0 +1,22 @@
+% Test video play
+
+%% V1
+
+% Test video play
+addpath("C:/Matfiles/Psychtoolbox")
+
+% Initialize Psychtoolbox
+Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference', 'VisualDebugLevel', 0);
+Screen('Preference', 'SuppressAllWarnings', 1);
+PsychDefaultSetup(2);
+
+% Open a window
+[window, windowRect] = PsychImaging('OpenWindow', 0, 0);
+
+c
+
+% Close the window
+Screen('CloseAll');
+
+
