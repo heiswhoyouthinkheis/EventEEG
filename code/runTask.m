@@ -18,6 +18,8 @@ if strcmp(hostname, 'mindemory.local') || strcmp(hostname, '10-17-200-14.dynapoo
     addpath(genpath('/Applications/Psychtoolbox'))
     parameters.isDemoMode=true;
     Screen('Preference', 'SkipSyncTests', 1)
+    Screen('Preference', 'VisualDebugLevel', 0);
+    Screen('Preference', 'SuppressAllWarnings', 1);
     PsychDefaultSetup(2);
     parameters.viewingDistance = 55;
     devType = 'neither';   
@@ -1190,11 +1192,11 @@ filename = [dirToSave filename];
 save(filename,'taskNames')
 
 line1 = 'Great job! You have come to the last part of the experiment.';
-line2 = 'Before we proceed, please wait for the experimenter to set up the equipment for this part.';
-line3 = 'Please do not press any key unless instructed by the experimenter.';
+line2 = '\n\n Before we proceed, please wait for the experimenter to set up the equipment for this part.';
+line3 = '\n\n Please do not press any key unless instructed by the experimenter.';
 
 % Draw instructions
-DrawFormattedText(screen.win, [line1 line2 line3], 'center', screen.screenYpixels * 0.25, screen.white);
+DrawFormattedText(screen.win, [line1 line2 line3], 'center', screen.screenYpixels * 0.35, screen.white);
 
 % Flip to the screen
 Screen('Flip', screen.win);
@@ -1204,10 +1206,10 @@ KbStrokeWait;
 
 % Page for accidental pressing.
 line1 = 'BACK UP SLIDE FOR ACCIDENTS!';
-line2 = 'DO NOT PROCEED UNLESS INSTRUCTED SO!';
+line2 = '\n\n DO NOT PROCEED UNLESS INSTRUCTED SO!';
 
 % Draw instructions
-DrawFormattedText(screen.win, [line1 line2], 'center', screen.screenYpixels * 0.55, screen.white);
+DrawFormattedText(screen.win, [line1 line2], 'center', screen.screenYpixels * 0.5, screen.white);
 
 % Flip to the screen
 Screen('Flip', screen.win);
@@ -1215,6 +1217,92 @@ Screen('Flip', screen.win);
 % Press any key to continue
 KbStrokeWait;
 
-% Instructions for recall
+% Instructions
+line1 = 'In the next section, you will be asked to recall the story verbally in detail.';
+line2 = '\n\n You have 15 seconds to prepare. Please start the verbal recall after you hear the "Beep".';
+line3 = '\n\n The countdown will start in 2 seconds';
+% Draw instructions
+DrawFormattedText(screen.win, [line1 line2 line3], 'center', screen.screenYpixels * 0.35, screen.white);
 
+% Flip to the screen
+Screen('Flip', screen.win);
+
+% Press any key to continue
+WaitSecs(5);
+
+% Determine the width of the rectangles
+wid = 50;
+
+% Make a base Rect of 200 by 200 pixels.
+baseRect = [0 0 wid wid];
+
+% Number of triangles
+numRects = 15;
+
+% Compute the total width 
+totalWidth = numRects*wid;
+
+% Initial position of the rectangle
+initPos = screen.xCenter - totalWidth / 2 + wid / 2;
+
+for i = 1:numRects
+
+    for j = 1:i    
+    
+    currentRect = CenterRectOnPointd(baseRect, initPos + (j-1) * wid, screen.screenYpixels*0.75);
+    
+    Screen('FillRect', screen.win, [1 1 1], currentRect);
+    
+    end
+    
+% Instructions
+line1 = 'In the next section, you will be asked to recall the story verbally in detail';
+line2 = '\n\n You have 15 seconds to prepare. Please start the verbal recall after you hear the "Beep".';
+
+% Draw instructions
+DrawFormattedText(screen.win, [line1 line2], 'center', screen.screenYpixels * 0.35, screen.white);
+
+Screen('Flip', window);
+
+WaitSecs(1);
+
+end
+
+% Draw fixation cross
+if strcmp(devType, 'EEG')
+    Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter], 2);
+elseif strcmp(devType, 'MEG')
+    Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter], 2);
+else
+    Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter]);
+end
+Screen('Flip', screen.win);
+
+Beeper(2000)
+
+%--! send trigger ! --
+
+if strcmp(devType, 'EEG')
+    write(port, 512,"uint8");
+elseif strcmp(devType, 'MEG')
+    PTBSendTrigger(512,0);
+else
+    Beeper(2000)
+end
+
+%--! send trigger ! --
+
+KbStrokeWait;
+
+% Instructions
+line1 = 'You have reached the end of the experiment. Thank you for your participation.';
+
+% Draw instructions
+DrawFormattedText(screen.win, [line1], 'center', screen.screenYpixels * 0.5, screen.white);
+
+Screen('Flip', window);
+
+
+
+KbStrokeWait;
 sca;

@@ -1,6 +1,6 @@
-% Test video play
+% Test video play and progress bar
 
-%% V1
+%% Play movie
 
 % Test video play
 addpath("C:/Matfiles/Psychtoolbox")
@@ -62,3 +62,195 @@ Screen('CloseMovie', movie);
 Screen('CloseAll');
 
 
+
+
+%% Progress bar
+
+
+Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference', 'VisualDebugLevel', 0);
+Screen('Preference', 'SuppressAllWarnings', 1);
+PsychDefaultSetup(2);
+% Open a window
+[window, windowRect] = PsychImaging('OpenWindow', 1, 0.5);
+
+Screen('BlendFunction', window, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+
+% Get the size of the on screen window in pixels
+[screenXpixels, screenYpixels] = Screen('WindowSize', window);
+
+% Get the centre coordinate of the window in pixels
+[xCenter, yCenter] = RectCenter(windowRect);
+
+% Determine the width of the rectangles
+wid = 50;
+
+% Make a base Rect of 200 by 200 pixels.
+baseRect = [0 0 wid wid];
+
+% Number of triangles
+numRects = 5;
+
+% Compute the total width 
+totalWidth = numRects*wid;
+
+% Initial position of the rectangle
+initPos = xCenter - totalWidth / 2 + wid / 2;
+
+for i = 1:numRects
+
+    for j = 1:i    
+    
+    currentRect = CenterRectOnPointd(baseRect, initPos + (j-1) * wid, yCenter);
+    
+    Screen('FillRect', window, [1 1 1], currentRect);
+    
+    end
+
+Screen('Flip', window);
+
+WaitSecs(1);
+
+end
+
+KbStrokeWait;
+
+sca;
+
+
+
+%% test
+
+
+
+Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference', 'VisualDebugLevel', 0);
+Screen('Preference', 'SuppressAllWarnings', 1);
+PsychDefaultSetup(2);
+% Open a window
+[window, windowRect] = PsychImaging('OpenWindow', 1, 0.5);
+
+Screen('BlendFunction', window, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
+
+% Get the size of the on screen window in pixels
+[screenXpixels, screenYpixels] = Screen('WindowSize', window);
+
+% Get the centre coordinate of the window in pixels
+[xCenter, yCenter] = RectCenter(windowRect);
+
+line1 = 'Great job! You have come to the last part of the experiment.';
+line2 = '\n\n Before we proceed, please wait for the experimenter to set up the equipment for this part.';
+line3 = '\n\n Please do not press any key unless instructed by the experimenter.';
+
+% Draw instructions
+DrawFormattedText(window, [line1 line2 line3], 'center', screenYpixels * 0.35, 1);
+
+% Flip to the screen
+Screen('Flip', window);
+
+% Press any key to continue
+KbStrokeWait;
+
+% Page for accidental pressing.
+line1 = 'BACK UP SLIDE FOR ACCIDENTS!';
+line2 = '\n\n DO NOT PROCEED UNLESS INSTRUCTED SO!';
+
+% Draw instructions
+DrawFormattedText(window, [line1 line2], 'center', screenYpixels * 0.55, 1);
+
+% Flip to the screen
+Screen('Flip', window);
+
+% Press any key to continue
+KbStrokeWait;
+
+% Instructions
+line1 = 'In the next section, you will be asked to recall the story verbally in detail';
+line2 = '\n\n You have 15 seconds to prepare. Please start the verbal recall after you hear the "Beep".';
+line3 = '\n\n The countdown will start in 2 seconds';
+% Draw instructions
+DrawFormattedText(window, [line1 line2 line3], 'center', screenYpixels * 0.35, 1);
+
+% Flip to the screen
+Screen('Flip', window);
+
+% Press any key to continue
+WaitSecs(5);
+
+% Determine the width of the rectangles
+wid = 50;
+
+% Make a base Rect of 200 by 200 pixels.
+baseRect = [0 0 wid wid];
+
+% Number of triangles
+numRects = 5;
+
+% Compute the total width 
+totalWidth = numRects*wid;
+
+% Initial position of the rectangle
+initPos = xCenter - totalWidth / 2 + wid / 2;
+
+for i = 1:numRects
+
+    for j = 1:i    
+    
+    currentRect = CenterRectOnPointd(baseRect, initPos + (j-1) * wid, screenYpixels*0.75);
+    
+    Screen('FillRect', window, [1 1 1], currentRect);
+    
+    end
+    
+% Instructions
+line1 = 'In the next section, you will be asked to recall the story verbally in detail.';
+line2 = '\n\n You have 15 seconds to prepare. Please start the verbal recall after you hear the "Beep".';
+
+% Draw instructions
+DrawFormattedText(window, [line1 line2], 'center', screenYpixels * 0.35, 1);
+
+Screen('Flip', window);
+
+WaitSecs(1);
+
+end
+
+% Set up the fixation cross
+fixCrossDimPix = 40;
+xCoords = [-fixCrossDimPix fixCrossDimPix 0 0];
+yCoords = [0 0 -fixCrossDimPix fixCrossDimPix];
+allCoords = [xCoords; yCoords];
+lineWidthPix = 4;
+
+% Draw fixation cross
+% if strcmp(devType, 'EEG')
+%     Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter], 2);
+% elseif strcmp(devType, 'MEG')
+%     Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter], 2);
+% else
+    Screen('DrawLines', window, allCoords, lineWidthPix, 1, [xCenter, yCenter]);
+% end
+Screen('Flip', window);
+
+Beeper(500)
+
+%--! send trigger ! --
+
+% if strcmp(devType, 'EEG')
+%     write(port, 512,"uint8");
+% elseif strcmp(devType, 'MEG')
+%     PTBSendTrigger(512,0);
+% else
+%     Beeper(2000)
+% end
+
+%--! send trigger ! --
+
+
+
+KbStrokeWait
+
+
+% Instructions for recall
+
+sca;
