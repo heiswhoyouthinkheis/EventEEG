@@ -15,10 +15,10 @@ PsychDefaultSetup(2);
 [window, windowRect] = PsychImaging('OpenWindow', 0, 0);
 
 % Get the duration for which the video should play (in seconds)
-playDuration = 40; % Change this to your desired duration
+playDuration = 20; % Change this to your desired duration
 
 % Get the movie file
-movieFile = 'C:/Users/Brain Yan/Downloads/galaxy.mp4'; 
+movieFile = fullfile(pwd,'../stimulus/videos/galaxy.mp4'); 
 
 % Open the movie file with additional parameters
 async = 0;

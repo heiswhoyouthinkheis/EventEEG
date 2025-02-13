@@ -12,6 +12,10 @@
 % recording device
 % fix video latency
 % note that the audio data is mono
+% change data storage directory
+% make words bigger
+% video issues is like due to initscreen
+% must open matlab2020 from search bar
 
 % Initialize Psychtoolbox and set up the experiment environment
 clear; close all; clc;
@@ -50,6 +54,7 @@ elseif strcmp(hostname, 'visioncore01m.psych.nyu.edu')
     port = init_trigger;
     parameters.isDemoMode = false;
     Screen('Preference', 'SkipSyncTests', 1)
+    Screen('Preference', 'VisualDebugLevel', 0);
     PsychDefaultSetup(2);
     parameters.viewingDistance = 55; % check once
     devType = 'EEG';
@@ -462,7 +467,7 @@ KbStrokeWait;
 % tasks = {'vt', 'vt', 'vt', 'vt', 'at', 'at', 'at', 'at'};  % Visual and Auditory Tasks
 % sequences_vt = {vtSeq1, vtSeq2, vtSeq3, vtSeq4};  % Visual sequences (replace with actual sequence names)
 % sequences_at = {atSeq1, atSeq2, atSeq3, atSeq4};  % Auditory sequences (replace with actual sequence names)
-% 
+%  
 % % the categories in the block
 % seqFieldsA = fieldnames(audSeq1);
 % seqFieldsV = fieldnames(visSeq1);
@@ -928,71 +933,71 @@ end
 
 
 
-% % play vid------------------
-% 
-% % Get the duration for which the video should play (in seconds)
-% playDuration = 300; % Change this to desired duration
-% 
-% % Get the movie file
-% % Define audio device
-% if devType == "neither"
-%     movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4'); 
-% elseif devType == "EEG"
-%     movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4');
-% end
-% 
-% 
-% 
-% % Open the movie file with additional parameters
-% async = 0;
-% preloadSecs = 0;
-% specialFlags1 = 0;
-% pixelFormat = 4;
-% maxNumberThreads = -1;
-% movieOptions = [];
-% 
-% movie = Screen('OpenMovie', screen.win, movieFile, async, preloadSecs, specialFlags1, pixelFormat, maxNumberThreads, movieOptions);
-% 
-% 
-% % Start playback engine
-% Screen('PlayMovie', movie, 1,1); 
-% 
-% % Get the start time
-% startTime = GetSecs;
-% 
-% % % Initialize key variables *BEFORE* the loop
-% % keyIsDown = false; % Initialize to false (no key pressed initially)
-% % keyCode = zeros(1, 256); % Initialize keyCode (size depends on your keyboard)
-% 
-% % Loop the video until the time is up
-% while (GetSecs - startTime) < playDuration
-%     % Check for new frame
-%     tex = Screen('GetMovieImage', screen.win, movie);
-% 
-%     % disp('debug')
-%     % % Check if 'q' is pressed (case-insensitive)
-%     % if keyIsDown
-%     %     if strcmpi(KbName(keyCode), 'q') % Compare key pressed with 'q'
-%     %         break; % Exit the loop if 'q' is pressed
-%     %     end
-%     % end
-% 
-%     % If there is a new frame, draw it
-%     if tex > 0
-%         Screen('DrawTexture', screen.win, tex);
-%         Screen('Flip', screen.win);
-%         Screen('Close', tex);
-%     end
-% end
-% 
-% 
-% 
-% % Stop playback
-% Screen('PlayMovie', movie, 0);
-% 
-% % Close the movie
-% Screen('CloseMovie', movie);
-% % end of vid-----------
+% play vid------------------
+
+% Get the duration for which the video should play (in seconds)
+playDuration = 20; % Change this to desired duration
+
+% Get the movie file
+% Define audio device
+if devType == "neither"
+    movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4'); 
+elseif devType == "EEG"
+    movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4');
+end
+
+
+
+% Open the movie file with additional parameters
+async = 0;
+preloadSecs = 1;
+specialFlags1 = 0;
+pixelFormat = 4;
+maxNumberThreads = -1;
+movieOptions = [];
+
+movie = Screen('OpenMovie', screen.win, movieFile, async, preloadSecs, specialFlags1, pixelFormat, maxNumberThreads, movieOptions);
+
+
+% Start playback engine
+Screen('PlayMovie', movie, 1,1); 
+
+% Get the start time
+startTime = GetSecs;
+
+% % Initialize key variables *BEFORE* the loop
+% keyIsDown = false; % Initialize to false (no key pressed initially)
+% keyCode = zeros(1, 256); % Initialize keyCode (size depends on your keyboard)
+
+% Loop the video until the time is up
+while (GetSecs - startTime) < playDuration
+    % Check for new frame
+    tex = Screen('GetMovieImage', screen.win, movie);
+
+    % disp('debug')
+    % % Check if 'q' is pressed (case-insensitive)
+    % if keyIsDown
+    %     if strcmpi(KbName(keyCode), 'q') % Compare key pressed with 'q'
+    %         break; % Exit the loop if 'q' is pressed
+    %     end
+    % end
+
+    % If there is a new frame, draw it
+    if tex > 0
+        Screen('DrawTexture', screen.win, tex);
+        Screen('Flip', screen.win);
+        Screen('Close', tex);
+    end
+end
+
+
+
+% Stop playback
+Screen('PlayMovie', movie, 0);
+
+% Close the movie
+Screen('CloseMovie', movie);
+% end of vid-----------
 
 
 
