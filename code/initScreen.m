@@ -38,7 +38,7 @@ Screen('BlendFunction', screen.win, 'GL_SRC_ALPHA', 'GL_ONE_MINUS_SRC_ALPHA');
 if strcmp(devType, 'MEG')
     Screen('TextSize', screen.win, 24);
 else
-    Screen('TextSize', screen.win, 48);
+    Screen('TextSize', screen.win, 80);
 end
 InitializePsychSound(1);
 

@@ -55,6 +55,8 @@ Screen('Flip', window);
 
 WaitSecs(1);
 
+defTextSize = 80; 
+
 % initialize data structure to store timing data
 timingData = struct();
 
@@ -87,7 +89,9 @@ startTime = GetSecs();
 for i = 1:length(seq)
     stimulus = seq{i};
     label = labels{i};
-
+    
+    Screen('TextSize', window, 250);
+    
     % Draw stimulus
     DrawFormattedText(window, stimulus, 'center', 'center', white);
 
@@ -151,6 +155,7 @@ end
 filename = [dirToSave filename];
 save(filename, 'timingData');
 
+Screen('TextSize', window, defTextSize);
 
 % line1 = 'This is the end of the task. Please put down the categories';
 % line2 = '\n\n you identified from the task. Press [space] to continue when you finish.';

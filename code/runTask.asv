@@ -9,12 +9,12 @@
 % counterbalancing argument input
 % add day id so that the files saved in one day can be distinguished
 % access conditions in terminal
-% change data storage directory
 % recording device
-% fix video latency --
-% note that the audio data is mono --
-% make words bigger --
-% video issues is likely due to initscreen, no GStreamer update? needs admin
+% fix video latency
+% note that the audio data is mono
+% change data storage directory
+% make words bigger
+% video issues is like due to initscreen, no GStreamer update? needs admin
 % permission
 % must open matlab2020 from search bar
 
@@ -632,7 +632,7 @@ Screen('Flip', screen.win);
 % storySeq = {'Marine' 'Main1' 'Medical' 'Main2' 'Trial' 'Main3' 'War' 'Main4'};
 
 % Test latency
-storySeq = {'Cue','Main1'};
+storySeq = {'Marine'};
 
 % initialize ds to store timing structure
 timingData3 = struct();
