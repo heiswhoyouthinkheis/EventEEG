@@ -84,7 +84,7 @@ else
 end
 Screen('Flip', window);
 
-KbStrokeWait;
+% KbStrokeWait;
 
 % initialize data structure to store timing data
 timingData = struct();
@@ -208,10 +208,10 @@ end
 
 timingData(1).startTime = startTime;
 
-
+% for testing, could ignore
 dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
 
-filename = sprintf('%s_timingData_%s_%s.mat', dateStringBlah, 'saud', cat);
+filename = sprintf('%s_timingData_%s_%s.mat', dateString, 'saud', cat);
 
 taskNames{end+1} = filename;
 dirToSave = '../../../TaskTiming/';

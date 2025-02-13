@@ -6,7 +6,7 @@
 function screen = initScreen(parameters, devType)
 % To make it transparent for working in demo mode
 if parameters.isDemoMode
-    PsychDebugWindowConfiguration(0, 0.8);
+    PsychDebugWindowConfiguration(0, 0.5);
 end
 
 screen.id = max(Screen('Screens')); %get the screen

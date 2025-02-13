@@ -254,3 +254,76 @@ KbStrokeWait
 % Instructions for recall
 
 sca;
+
+
+
+
+%% test image display
+
+% Clear the workspace and close all windows
+clear;
+close all;
+sca;
+
+% Initialize Psychtoolbox
+PsychDefaultSetup(2);
+Screen('Preference', 'SkipSyncTests', 1);
+
+% Open a window
+screenNumber = max(Screen('Screens'));
+[window, windowRect] = PsychImaging('OpenWindow', screenNumber, [0.5 0.5 0.5]); % Grey background
+
+% Get the screen dimensions
+[screenWidth, screenHeight] = Screen('WindowSize', window);
+
+% Load the image
+imagePath = fullfile(pwd, '../stimulus/images/testimage4k.jpg'); % Replace with the path to your image
+image = imread(imagePath);
+imageHeight = size(image, 1);
+imageWidth = size(image, 2);
+
+% Calculate the scaling factor to fill the screen while maintaining aspect ratio
+screenAspectRatio = screenWidth / screenHeight;
+imageAspectRatio = imageWidth / imageHeight;
+
+if imageAspectRatio > screenAspectRatio
+    % Image is wider than the screen; scale based on height
+    scaleFactor = screenHeight / imageHeight;
+else
+    % Image is taller than the screen; scale based on width
+    scaleFactor = screenWidth / imageWidth;
+end
+
+% Scale the image dimensions
+scaledWidth = imageWidth * scaleFactor;
+scaledHeight = imageHeight * scaleFactor;
+
+% Create a texture from the image
+imageTexture = Screen('MakeTexture', window, image);
+
+% Calculate the destination rectangle for the image
+destinationRect = CenterRectOnPointd([0 0 scaledWidth scaledHeight], screenWidth/2, screenHeight/2);
+
+while true
+
+% Draw the image
+Screen('DrawTexture', window, imageTexture, [], destinationRect);
+
+% Flip to the screen
+Screen('Flip', window);
+ 
+    [keyIsDown, ~, keyCode] = KbCheck;
+    if keyIsDown
+        % if strcmpi(KbName(keyCode), 'q') % Compare key pressed with 'q'
+        %     break; % Exit the loop if 'q' is pressed
+        % end
+        break
+    end
+
+end
+
+% Wait for a key press to exit
+KbStrokeWait;
+
+% Close the window
+sca;

@@ -49,38 +49,66 @@ function [seqAll] = toneSequence(tones)
                 end
             end
             
-            % Combine the regular and odd tones
-            sequence = [reg_tones, odd_tones];
-            sequence_labels = [reg_labels, odd_labels];
+            % Get the randomized sequence while making sure the first items
+            % are regular
 
-            % Ensure the first four stimuli come from the "regular" category
-            first_four_reg = reg_tones(1:4);
-            first_four_labels = repmat({'reg'}, 1, 4);
-            
-            % Shuffle the remaining part of the sequence and labels (after the first 4)
-            shuff = randperm(sequence_length - 4) + 4;  % Shuffle the rest starting from the 5th element
-            shuffled_sequence = sequence(shuff);
-            shuffled_labels = sequence_labels(shuff);
-            
-            % Combine the first four regular tones with the shuffled remainder
-            final_sequence = [first_four_reg, shuffled_sequence];
-            final_labels = [first_four_labels, shuffled_labels];
-            
-            % Store the sequences and labels
-            sequences.([num2str(category)]) = final_sequence;
-            labels.([num2str(category)]) = final_labels;
-            
-            % Shuffle the combined sequence and labels
-            shuff = randperm(sequence_length);
-            shuffled_sequence = sequence(shuff);
-            shuffled_labels = sequence_labels(shuff);
-            
-            % Store the sequences and labels
-            sequences.([num2str(category)]) = shuffled_sequence;
-            labels.([num2str(category)]) = shuffled_labels;
+            prefixN = 4; % numbers of initial regular items
+            toneReg1 = reg_tones(1:prefixN);
+            toneReg2 = reg_tones((prefixN + 1):end);
 
+            % Slice the labels for regs 
+            regLabelsPre = reg_labels(1:prefixN);
+            regLabelsSuf = reg_labels((prefixN+1):end);
+
+            % Construct the suffix words and labels to be shuffled
+            seqSuffix = [toneReg2 odd_tones]; % construct the suffix of the sequence
+            labelSuffix = [regLabelsSuf odd_labels]; % the labels
+            
+            % Randomize the suffix of the sequence
+            shuffledIdx = randperm(30-prefixN);
+            seqSuffixShuffled = seqSuffix(shuffledIdx);
+            labelSuffixShuffled = labelSuffix(shuffledIdx);
+
+            % Construct the final sequence and corresponding labels
+            sequence = [toneReg1 seqSuffixShuffled];
+            sequenceLabels = [regLabelsPre labelSuffixShuffled];
+
+            % Store the sequences and labels
+            sequences.([num2str(category)]) = sequence;
+            labels.([num2str(category)]) = sequenceLabels;
+
+        %     % Combine the regular and odd tones
+        %     sequence = [reg_tones, odd_tones];
+        %     sequence_labels = [reg_labels, odd_labels];
+        % 
+        %     % Ensure the first four stimuli come from the "regular" category
+        %     first_four_reg = reg_tones(1:4);
+        %     first_four_labels = repmat({'reg'}, 1, 4);
+        % 
+        %     % Shuffle the remaining part of the sequence and labels (after the first 4)
+        %     shuff = randperm(sequence_length - 4) + 4;  % Shuffle the rest starting from the 5th element
+        %     shuffled_sequence = sequence(shuff);
+        %     shuffled_labels = sequence_labels(shuff);
+        % 
+        %     % Combine the first four regular tones with the shuffled remainder
+        %     final_sequence = [first_four_reg, shuffled_sequence];
+        %     final_labels = [first_four_labels, shuffled_labels];
+        % 
+        %     % Store the sequences and labels
+        %     sequences.([num2str(category)]) = final_sequence;
+        %     labels.([num2str(category)]) = final_labels;
+        % 
+        %     % Shuffle the combined sequence and labels
+        %     shuff = randperm(sequence_length);
+        %     shuffled_sequence = sequence(shuff);
+        %     shuffled_labels = sequence_labels(shuff);
+        % 
+        %     % Store the sequences and labels
+        %     sequences.([num2str(category)]) = shuffled_sequence;
+        %     labels.([num2str(category)]) = shuffled_labels;
+        % 
         end
-    
+
     % Store sequences and labels for the current block in seqAll
         % seqAll.(blkName).Sequences = sequences;
         % seqAll.(blkName).Labels = labels;

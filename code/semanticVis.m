@@ -138,8 +138,10 @@ end
 
 timingData(1).startTime = startTime;
 
+% For testing, could ignore
 dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
-filename = sprintf('%s_timingData_%s_%s.mat', dateStringBlah, 'svis', category);
+
+filename = sprintf('%s_timingData_%s_%s.mat', dateString, 'svis', category);
 
 taskNames{end+1} = filename;
 dirToSave = '../../../TaskTiming/';

@@ -3,9 +3,22 @@
 % And has been adapted for this course by Mrugank Dake
 % (mrugank.dake@nyu.edu)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                                                                                        
+
+% [TODO 02/12/25] set up as a function so that it can be run from the
+% terminal
+% counterbalancing argument input
+% add day id so that the files saved in one day can be distinguished
+% access conditions in terminal
+% recording device
+% fix video latency
+% note that the audio data is mono
+
 % Initialize Psychtoolbox and set up the experiment environment
 clear; close all; clc;
+
+% ---- !! Counterbalancing !! ---- 
+% if 0, run catA, if 1, run catB
+ctCondition = 0;
 
 % Check the system running on: currently accepted: syndrome, tmsubuntu
 [ret, hostname] = system('hostname');
@@ -14,8 +27,8 @@ if ret ~= 0
 end
 hostname = strtrim(hostname);
 
-if strcmp(hostname, 'mindemory.local') || strcmp(hostname, '10-17-200-14.dynapool.wireless.nyu.edu')
-    addpath(genpath('/Applications/Psychtoolbox'))
+if strcmp(hostname, 'Hardware') || strcmp(hostname, '10-17-200-14.dynapool.wireless.nyu.edu')
+    addpath(genpath('"C:\Matfiles\Psychtoolbox"'))
     parameters.isDemoMode=true;
     Screen('Preference', 'SkipSyncTests', 1)
     Screen('Preference', 'VisualDebugLevel', 0);
@@ -23,6 +36,7 @@ if strcmp(hostname, 'mindemory.local') || strcmp(hostname, '10-17-200-14.dynapoo
     PsychDefaultSetup(2);
     parameters.viewingDistance = 55;
     devType = 'neither';   
+    port = 0;
 elseif strcmp(hostname, 'meg-stim-mac.psych.nyu.edu')
     addpath(genpath('/Applications/Psychtoolbox'))
     parameters.isDemoMode = false;
@@ -37,14 +51,12 @@ elseif strcmp(hostname, 'visioncore01m.psych.nyu.edu')
     parameters.isDemoMode = false;
     Screen('Preference', 'SkipSyncTests', 1)
     PsychDefaultSetup(2);
-    parameters.viewingDistance = 25; % check once
+    parameters.viewingDistance = 55; % check once
     devType = 'EEG';
 end
 stimDir = '../stimulus';
 screen = initScreen(parameters, devType);
 
-% if 0, run catA, if 1, run catB
-ctCondition = 0;
 
 % Screen('Preference', 'SkipSyncTests', 1)
 
@@ -64,6 +76,10 @@ ctCondition = 0;
 % average display time for semantic audio stimulus is 0.457740545
 % average gap time is 1 sec
 %
+
+% 02/12/25
+% new edits:
+% fixation cross is now automatically customized to fit the screen size
 
 %---------trigger code-------------------------------------
 % addpath('triggers');
@@ -104,7 +120,8 @@ curr_dir = stimDir;
 
 
 
-
+% [rev] this section is probably not needed since the stimuli for vis will
+% be retrieved from the audio data names
 %--visual semantic oddball setup start------------------------------
 
 % read the file that contains all the word
@@ -192,20 +209,30 @@ end
 
 disp('import finished');
 
-% Set up the fixation cross
-fixCrossDimPix = 40;
+% % Set up the fixation cross
+% fixCrossDimPix = 40;
+% xCoords = [-fixCrossDimPix fixCrossDimPix 0 0];
+% yCoords = [0 0 -fixCrossDimPix fixCrossDimPix];
+% allCoords = [xCoords; yCoords];
+% lineWidthPix = 4;
+
+% Set up the fixation cross (customized to the screen) 
+fixCrossDimPix = screen.screenYpixels/27;
 xCoords = [-fixCrossDimPix fixCrossDimPix 0 0];
 yCoords = [0 0 -fixCrossDimPix fixCrossDimPix];
 allCoords = [xCoords; yCoords];
-lineWidthPix = 4;
+lineWidthPix = screen.screenYpixels/270;
 
 
 %-----------visual display setup end---------------------------------
 
 % Define audio device
-FSMan = 24000;
-audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
-
+if devType == "neither"
+    audioDevice = PsychPortAudio('Open', [], 1, 1, [],1);
+elseif devType == "EEG"
+    FSMan = 24000;
+    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+end
 % Set playback volume to 60%
 PsychPortAudio('Volume', audioDevice, 0.6);
 
@@ -225,6 +252,8 @@ disp('audio setup finished')
 % officesupply	  clothing
 % building	          sport
 % bodypart	          instrument
+% Just to stress, categories contains all the names of the categories,
+% which contains all names of the words 
 
 fields_catA = {"animal","vegetable","occupation","kitchenware","weapon","officesupply","building","bodypart"};
 fields_catB ={"insect","fruit","vehicle","tool","furniture","clothing","sport","instrument"};
@@ -253,7 +282,7 @@ else
 end
 
 % select the stimuli for the 2*2 blocks
-fieldAud = fieldnames(catAud);
+fieldAud = fieldnames(catAud); % get the fieldnames of the categories
 fieldVis = fieldnames(catVis);
 
 fieldAud = fieldAud(randperm(length(fieldAud)));
@@ -285,11 +314,17 @@ end
 % for each block, split the stimuli into reg and odd
 % store them into two ds,
 
-% access all fieldnames and group them by blocks
-fieldAud1 = fieldAud(1:4);
-fieldAud2 = fieldAud(5:8);
-fieldVis1 = fieldVis(1:4);
-fieldVis2 = fieldVis(5:8);
+% % access all fieldnames and group them by blocks (way1)
+% fieldAud1 = fieldAud(1:4);
+% fieldAud2 = fieldAud(5:8);
+% fieldVis1 = fieldVis(1:4);
+% fieldVis2 = fieldVis(5:8);
+
+% access all fieldnames that are grouped by blocks (way2)
+fieldAud1 = fieldnames(audBlk1);
+fieldAud2 = fieldnames(audBlk2);
+fieldVis1 = fieldnames(visBlk1);
+fieldVis2 = fieldnames(visBlk2);
 
 % first block auditory
 reg = struct();
@@ -534,6 +569,7 @@ for i = 1:length(random_order)
     end
 end
 
+% Clean up
 PsychPortAudio('Close', audioDevice);
 
 %------------------end of Section I------------------------------
@@ -562,8 +598,12 @@ PsychPortAudio('Close', audioDevice);
 % ----------Section II------------------------------------------------
 
 % Define audio device
-FSMan = 24000;
-audioDevice = PsychPortAudio('Open', [], 1, 1, [], 2);
+if devType == "neither"
+    audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
+elseif devType == "EEG"
+    FSMan = 24000;
+    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+end
 
 % Set playback volume to 60%
 PsychPortAudio('Volume', audioDevice, 0.6);
@@ -577,14 +617,6 @@ DrawFormattedText(screen.win, [line1 line2], 'center', 'center', screen.white);
 % Flip to the screen
 Screen('Flip', screen.win);
 
-
-
-
-% Define audio device (no need since no clean up in the previous section)
-% audioDevice = PsychPortAudio('Open', [], 1, 1, [], 2);
-
-% Set playback volume to 60%
-PsychPortAudio('Volume', audioDevice, 0.6);
 
 
 % PsychPortAudio('FillBuffer', audioDevice, [storyAu']);
@@ -684,7 +716,8 @@ for i = 1:numel(storySeq)
 end
 
 dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
-filename = sprintf('%s_timingData_%s.mat', dateStringBlah, 'story2');
+
+filename = sprintf('%s_timingData_%s.mat', dateString, 'story2');
 dirToSave = '../../../TaskTiming/';
 if ~exist("dirToSave", 'dir')
     mkdir(dirToSave)  
@@ -692,6 +725,9 @@ end
 filename = [dirToSave filename];
 % Save timing data to a .mat file
 save(filename, 'timingData3');
+
+% Clean up
+PsychPortAudio('Close', audioDevice);
 %------------end of Section II--------------------------------------
 
 
@@ -723,8 +759,12 @@ save(filename, 'timingData3');
 %-------------------Section III----------------------------------
 
 % Define audio device
-FSMan = 24000;
-audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+if devType == "neither"
+    audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
+elseif devType == "EEG"
+    FSMan = 24000;
+    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+end
 
 % Set playback volume to 60%
 PsychPortAudio('Volume', audioDevice, 0.6);
@@ -778,6 +818,10 @@ for i = 1:length(random_order)
             seqAll.caBlk1.Labels.(current_task.labels), date, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port); % Call classical auditory
     end
 end
+
+% Clean up
+PsychPortAudio('Close', audioDevice);
+
 %-----------------end of Section III---------------------------
 
 
@@ -816,52 +860,144 @@ Screen('Flip', screen.win);
 
 KbStrokeWait;
 
-% play vid------------------
 
-% Get the duration for which the video should play (in seconds)
-playDuration = 300; % Change this to your desired duration
+% display image-------------------------------------------------
 
-% Get the movie file
-movieFile = 'C:/Users/Brain Yan/Downloads/galaxy.mp4'; 
+% Load the image
+imagePath = fullfile(pwd, '../stimulus/images/testimage4k.jpg'); 
+image = imread(imagePath);
+imageHeight = size(image, 1);
+imageWidth = size(image, 2);
 
-% Open the movie file with additional parameters
-async = 0;
-preloadSecs = 1;
-specialFlags1 = 0;
-pixelFormat = 4;
-maxNumberThreads = -1;
-movieOptions = [];
+% Calculate the scaling factor to fill the screen while maintaining aspect ratio
+screenAspectRatio = screen.screenXpixels / screen.screenYpixels;
+imageAspectRatio = imageWidth / imageHeight;
 
-movie = Screen('OpenMovie', screen.win, movieFile, async, preloadSecs, specialFlags1, pixelFormat, maxNumberThreads, movieOptions);
-
-
-% Start playback engine
-Screen('PlayMovie', movie, 1,1);
-
-% Get the start time
-startTime = GetSecs;
-
-% Loop the video until the time is up
-while (GetSecs - startTime) < playDuration
-    % Check for new frame
-    tex = Screen('GetMovieImage', screen.win, movie);
-    
-    % If there is a new frame, draw it
-    if tex > 0
-        Screen('DrawTexture', screen.win, tex);
-        Screen('Flip', screen.win);
-        Screen('Close', tex);
-    end
+if imageAspectRatio > screenAspectRatio
+    % Image is wider than the screen; scale based on height
+    scaleFactor = screen.screenYpixels / imageHeight;
+else
+    % Image is taller than the screen; scale based on width
+    scaleFactor = screen.screenXpixels / imageWidth;
 end
 
+% Scale the image dimensions
+scaledWidth = imageWidth * scaleFactor;
+scaledHeight = imageHeight * scaleFactor;
+
+% Create a texture from the image
+imageTexture = Screen('MakeTexture', screen.win, image);
+
+% Calculate the destination rectangle for the image
+destinationRect = CenterRectOnPointd([0 0 scaledWidth scaledHeight], screen.screenXpixels/2, screen.screenYpixels/2);
+
+% Draw the image
+Screen('DrawTexture', screen.win, imageTexture, [], destinationRect);
+
+Screen('Flip', screen.win)
 
 
-% Stop playback
-Screen('PlayMovie', movie, 0);
+% Get the duration for which the video should play (in seconds)
+playDuration = 300; % Change this to desired duration
 
-% Close the movie
-Screen('CloseMovie', movie);
-% end of vid-----------
+startTime = GetSecs; 
+
+% % Initialize key variables *BEFORE* the loop
+% keyIsDown = false; % Initialize to false (no key pressed initially)
+% keyCode = zeros(1, 256); % Initialize keyCode (size depends on your keyboard)
+
+while (GetSecs - startTime) < playDuration
+
+
+    % disp('debug')
+    % % Check if 'q' is pressed (case-insensitive)
+    % Check for a key press
+    [keyIsDown, ~, keyCode] = KbCheck;
+    if keyIsDown
+        if strcmpi(KbName(keyCode), 'q') % Compare key pressed with 'q'
+            break; % Exit the loop if 'q' is pressed
+        end
+        % break
+    end
+
+end
+
+% end of image display------------------------------
+
+
+
+
+
+% % play vid------------------
+% 
+% % Get the duration for which the video should play (in seconds)
+% playDuration = 300; % Change this to desired duration
+% 
+% % Get the movie file
+% % Define audio device
+% if devType == "neither"
+%     movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4'); 
+% elseif devType == "EEG"
+%     movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4');
+% end
+% 
+% 
+% 
+% % Open the movie file with additional parameters
+% async = 0;
+% preloadSecs = 0;
+% specialFlags1 = 0;
+% pixelFormat = 4;
+% maxNumberThreads = -1;
+% movieOptions = [];
+% 
+% movie = Screen('OpenMovie', screen.win, movieFile, async, preloadSecs, specialFlags1, pixelFormat, maxNumberThreads, movieOptions);
+% 
+% 
+% % Start playback engine
+% Screen('PlayMovie', movie, 1,1); 
+% 
+% % Get the start time
+% startTime = GetSecs;
+% 
+% % % Initialize key variables *BEFORE* the loop
+% % keyIsDown = false; % Initialize to false (no key pressed initially)
+% % keyCode = zeros(1, 256); % Initialize keyCode (size depends on your keyboard)
+% 
+% % Loop the video until the time is up
+% while (GetSecs - startTime) < playDuration
+%     % Check for new frame
+%     tex = Screen('GetMovieImage', screen.win, movie);
+% 
+%     % disp('debug')
+%     % % Check if 'q' is pressed (case-insensitive)
+%     % if keyIsDown
+%     %     if strcmpi(KbName(keyCode), 'q') % Compare key pressed with 'q'
+%     %         break; % Exit the loop if 'q' is pressed
+%     %     end
+%     % end
+% 
+%     % If there is a new frame, draw it
+%     if tex > 0
+%         Screen('DrawTexture', screen.win, tex);
+%         Screen('Flip', screen.win);
+%         Screen('Close', tex);
+%     end
+% end
+% 
+% 
+% 
+% % Stop playback
+% Screen('PlayMovie', movie, 0);
+% 
+% % Close the movie
+% Screen('CloseMovie', movie);
+% % end of vid-----------
+
+
+
+
+
 
 % Instructions
 line = 'Ready? Press [space] to continue to the second part of the experiment.';
@@ -888,10 +1024,10 @@ end
 
 %--------------------rest--------------------------------------------
 
+ 
 
 
-
-
+ 
 
 
 
@@ -901,6 +1037,17 @@ end
 
 % -------------------begin section IV---------------------------------------
 
+% Define audio device
+if devType == "neither"
+    audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
+elseif devType == "EEG"
+    FSMan = 24000;
+    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+end
+% Set playback volume to 60%
+PsychPortAudio('Volume', audioDevice, 0.6);
+
+disp('audio setup finished')
 
 % the categories in the block
 seqFieldsA = fieldnames(audSeq2);
@@ -952,8 +1099,9 @@ for i = 1:length(random_order)
     end
 end
 
-
+% Clean up
 PsychPortAudio('Close', audioDevice);
+
 %----------------end of section IV---------------------------------
 
 
@@ -970,8 +1118,12 @@ PsychPortAudio('Close', audioDevice);
 %------------------start of Section V-----------------------------------
 
 % Define audio device
-FSMan = 24000;
-audioDevice = PsychPortAudio('Open', [], 1, 1, [], 2);
+if devType == "neither"
+    audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
+elseif devType == "EEG"
+    FSMan = 24000;
+    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+end
 
 % Set playback volume to 60%
 PsychPortAudio('Volume', audioDevice, 0.6);
@@ -1092,7 +1244,8 @@ for i = 1:numel(storySeq)
 end
 
 dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
-filename = sprintf('%s_timingData_%s.mat', dateStringBlah, 'story2');
+
+filename = sprintf('%s_timingData_%s.mat', dateString, 'story2');
 dirToSave = '../../../TaskTiming/';
 if ~exist("dirToSave", 'dir')
     mkdir(dirToSave)
@@ -1100,6 +1253,9 @@ end
 filename = [dirToSave filename];
 % Save timing data to a .mat file
 save(filename, 'timingData3');
+
+% Clean up
+PsychPortAudio('Close', audioDevice);
 
 
 %-------------------end of Section V--------------------------
@@ -1124,8 +1280,12 @@ save(filename, 'timingData3');
 
 %--------------------Section VI---------------------------------------
 % Define audio device
-FSMan = 24000;
-audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+if devType == "neither"
+    audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
+elseif devType == "EEG"
+    FSMan = 24000;
+    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+end
 
 % Set playback volume to 60%
 PsychPortAudio('Volume', audioDevice, 0.6);
@@ -1180,6 +1340,9 @@ for i = 1:length(random_order)
     end
 end
 
+% Clean up
+PsychPortAudio('Close', audioDevice);
+
 
 %----------------end of Section VI-----------------------------------
 
@@ -1227,7 +1390,7 @@ DrawFormattedText(screen.win, [line1 line2 line3], 'center', screen.screenYpixel
 % Flip to the screen
 Screen('Flip', screen.win);
 
-% Press any key to continue
+% wait
 WaitSecs(5);
 
 % Determine the width of the rectangles
@@ -1262,7 +1425,7 @@ line2 = '\n\n You have 15 seconds to prepare. Please start the verbal recall aft
 % Draw instructions
 DrawFormattedText(screen.win, [line1 line2], 'center', screen.screenYpixels * 0.35, screen.white);
 
-Screen('Flip', window);
+Screen('Flip', screen.win);
 
 WaitSecs(1);
 
@@ -1300,7 +1463,7 @@ line1 = 'You have reached the end of the experiment. Thank you for your particip
 % Draw instructions
 DrawFormattedText(screen.win, [line1], 'center', screen.screenYpixels * 0.5, screen.white);
 
-Screen('Flip', window);
+Screen('Flip', screen.win);
 
 
 
