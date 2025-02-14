@@ -19,7 +19,7 @@
 %   specific for classicalAud
 
 function [timingData,taskNames] = classicalAud(cat, seq, labels, ...
-    dateString, window, white, allCoords, lineWidthPix, xCenter, yCenter, taskNames, devType, port)
+    subjectID, window, white, allCoords, lineWidthPix, xCenter, yCenter, taskNames, devType, port, dataDir)
 
 % Draw loading instruction to wait for sequence creation
 line = 'loading ...';
@@ -148,14 +148,17 @@ timingData(1).startTime = startTime;
 % for testing, ignore
 dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
 
-filename = sprintf('%s_timingData_%s_%s.mat', dateString, 'caud', cat);
+filename = sprintf('%s_timingData_%s_%s.mat', subjectID, 'caud', cat);
 
 taskNames{end+1} = filename;
-dirToSave = '../../../TaskTiming/';
-if ~exist("dirToSave", 'dir')
-    mkdir(dirToSave)
-end
-filename = [dirToSave filename];
+
+% dir name for data storage
+dirToSave = fullfile(dataDir, 'classicalAud');
+
+% created directory if not found
+mkdir(dirToSave)  
+
+filename = fullfile(dirToSave, filename);
 
 save(filename, 'timingData');
 

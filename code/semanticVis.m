@@ -14,7 +14,7 @@
 % the following arguments are general
 
 function [timingData, taskNames] = semanticVis(cat, seq, labels, ...
-    dateString, window, white, allCoords, lineWidthPix, xCenter, yCenter, taskNames, devType, port)
+    subjectID, window, white, allCoords, lineWidthPix, xCenter, yCenter, taskNames, devType, port, dataDir)
 
 % Draw loading instruction to wait for sequence creation
 line = 'loading ...';
@@ -145,14 +145,18 @@ timingData(1).startTime = startTime;
 % For testing, could ignore
 dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
 
-filename = sprintf('%s_timingData_%s_%s.mat', dateString, 'svis', category);
+filename = sprintf('%s_timingData_%s_%s.mat', subjectID, 'svis', category);
 
 taskNames{end+1} = filename;
-dirToSave = '../../../TaskTiming/';
-if ~exist("dirToSave", 'dir')
-    mkdir(dirToSave)
-end
-filename = [dirToSave filename];
+
+% dir name for data storage
+dirToSave = fullfile(dataDir, 'semanticVis');
+
+% created directory if not found
+mkdir(dirToSave)  
+
+filename = fullfile(dirToSave, filename);
+
 save(filename, 'timingData');
 
 Screen('TextSize', window, defTextSize);

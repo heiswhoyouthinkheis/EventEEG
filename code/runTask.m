@@ -5,11 +5,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % [TODO 02/12/25] set up as a function so that it can be run from the
-% terminal
-% counterbalancing argument input
-% add day id so that the files saved in one day can be distinguished
-% access conditions in terminal
-% change data storage directory
+% terminal --
+% counterbalancing argument input  --
+% add day id so that the files saved in one day can be distinguished --
+% access conditions in terminal  --
+% change data storage directory  --
 % recording device
 % fix video latency --
 % note that the audio data is mono --
@@ -17,75 +17,29 @@
 % video issues is likely due to initscreen, no GStreamer update? needs admin
 % permission
 % must open matlab2020 from search bar
-
-% Initialize Psychtoolbox and set up the experiment environment
-clear; close all; clc;
-
-% ---- !! Counterbalancing !! ---- 
-% if 0, run catA, if 1, run catB
-ctCondition = 0;
-
-% Check the system running on: currently accepted: syndrome, tmsubuntu
-[ret, hostname] = system('hostname');
-if ret ~= 0
-    hostname = getenv('HOSTNAME');
-end
-hostname = strtrim(hostname);
-
-if strcmp(hostname, 'Hardware') || strcmp(hostname, '10-17-200-14.dynapool.wireless.nyu.edu')
-    addpath(genpath('"C:\Matfiles\Psychtoolbox"'))
-    parameters.isDemoMode=true;
-    Screen('Preference', 'SkipSyncTests', 1)
-    Screen('Preference', 'VisualDebugLevel', 0);
-    Screen('Preference', 'SuppressAllWarnings', 1);
-    PsychDefaultSetup(2);
-    parameters.viewingDistance = 55;
-    devType = 'neither';   
-    port = 0;
-elseif strcmp(hostname, 'meg-stim-mac.psych.nyu.edu')
-    addpath(genpath('/Applications/Psychtoolbox'))
-    parameters.isDemoMode = false;
-    Screen('Preference', 'SkipSyncTests', 1)
-    PsychDefaultSetup(2);
-    parameters.viewingDistance = 25; % check once
-    devType = 'MEG';
-elseif strcmp(hostname, 'visioncore01m.psych.nyu.edu')
-    addpath(genpath('/Applications/Psychtoolbox'))
-    addpath(genpath('/Users/michelmannlab/Documents/BioSemiTrigger'));
-    port = init_trigger;
-    parameters.isDemoMode = false;
-    Screen('Preference', 'SkipSyncTests', 1)
-    Screen('Preference', 'VisualDebugLevel', 0);
-    PsychDefaultSetup(2);
-    parameters.viewingDistance = 55; % check once
-    devType = 'EEG';
-end
-stimDir = '../stimulus';
-screen = initScreen(parameters, devType);
-
-
-% Screen('Preference', 'SkipSyncTests', 1)
-
-%---------------!!!!!!!!mods required!!!!!!----------------------%
-% add "port" to function input for trigger sending
-% figure out stimulus choice
-%   odd words from two categories check----------------
-% discuss stimulus presentation duration
-%   try to unify the trial length (stimulus + gap) check--------
-% instructions for recall?
-%   no.
-% make sure that a word does not repeat too soon
-% check, now by 5--------------------
-% for each task in each section, stimulus needs to be manually inputted
-% the recorded file name is date+name+task+regular stimulus
-
-% average display time for semantic audio stimulus is 0.457740545
-% average gap time is 1 sec
-%
+% change image
+% create control condition
 
 % 02/12/25
 % new edits:
 % fixation cross is now automatically customized to fit the screen size
+% first items are regular
+
+% [TODO sometime ago] add "port" to function input for trigger sending --
+% figure out stimulus choice --
+%   odd words from two categories check----------------
+% discuss stimulus presentation duration --
+%   try to unify the trial length (stimulus + gap) check--------
+% instructions for recall?
+%   no.
+% make sure that a word does not repeat too soon 
+% check, now by 5--------------------
+% for each task in each section, stimulus needs to be manually inputted
+% the recorded file name is date+name+task+regular stimulus --
+
+% average display time for semantic audio stimulus is 0.457740545
+% average gap time is 1 sec
+%
 
 %---------trigger code-------------------------------------
 % addpath('triggers');
@@ -110,9 +64,100 @@ screen = initScreen(parameters, devType);
 % start and end = 256
 %-----------trigger code----------------------------
 
+
+
+% Running the (main vs. control) task.
+% subject = numerical value to identify subjects run in the same day (1,
+% 2,...)
+% condition = counterbalancing condition codes (0 or 1)
+function runTask(subject,condition)
+
+% Initialize Psychtoolbox and set up the experiment environment
+close all; clc;
+
+% Check if both arguments are missing
+if nargin < 2
+    error('Please enter both subject identifier and condition code (0 or 1).');
+end
+
+% Validate subject (example: ensure it's non-empty)
+if isempty(subject) || ~isnumeric(subject)
+    error('subject must be a number(e.g., 1).');
+end
+
+% Validate ctCondition
+if ~ismember(condition, [0, 1])
+    error('Invalid condition code. Use 0 or 1.');
+end
+
 % get the date of the experiment to add to file name later
 date = datestr(now, 'yyyymmdd_HHMMSS');
 date = date(1:8);
+
+% define subjectID
+subjectID = ['sub_' date '_' num2str(subject)];
+
+% Rest of your experiment code
+disp(['Running experiment for subject: ', subjectID]);
+disp(['Condition: ', num2str(condition)]);
+
+
+% ---- !! Counterbalancing !! ---- 
+% if 0, run catA, if 1, run catB
+ctCondition = condition;
+
+
+% Check the system running on: currently accepted: syndrome, tmsubuntu
+[ret, hostname] = system('hostname');
+if ret ~= 0
+    hostname = getenv('HOSTNAME');
+end
+hostname = strtrim(hostname);
+
+if strcmp(hostname, 'Hardware') || strcmp(hostname, '10-17-200-14.dynapool.wireless.nyu.edu')
+    addpath(genpath('"C:\Matfiles\Psychtoolbox"'))
+    parameters.isDemoMode=true;
+    Screen('Preference', 'SkipSyncTests', 1)
+    Screen('Preference', 'VisualDebugLevel', 0);
+    Screen('Preference', 'SuppressAllWarnings', 1);
+    PsychDefaultSetup(2);
+    parameters.viewingDistance = 55;
+    devType = 'neither';   
+    port = 0;
+elseif strcmp(hostname, 'meg-stim-mac.psych.nyu.edu')
+    addpath(genpath('/Applications/Psychtoolbox'))
+    parameters.isDemoMode = false;
+    Screen('Preference', 'SkipSyncTests', 1)
+    PsychDefaultSetup(2);
+    parameters.viewingDistance = 25; % check onceq
+    devType = 'MEG';
+elseif strcmp(hostname, 'visioncore01m.psych.nyu.edu')
+    addpath(genpath('/Applications/Psychtoolbox'))
+    addpath(genpath('/Users/michelmannlab/Documents/BioSemiTrigger'));
+    port = init_trigger;
+    parameters.isDemoMode = false;
+    Screen('Preference', 'SkipSyncTests', 1)
+    Screen('Preference', 'VisualDebugLevel', 0);
+    PsychDefaultSetup(2);
+    parameters.viewingDistance = 55; % check once
+    devType = 'EEG';
+end
+stimDir = '../stimulus';
+screen = initScreen(parameters, devType);
+
+% Set data storage directory
+dataDir = fullfile('../timingData/', subjectID);
+
+mkdir(dataDir)  
+
+disp(['Data storage directory: ', dataDir])
+
+% Screen('Preference', 'SkipSyncTests', 1)
+
+
+
+
+
 
 % ---the following section imports all the audio files and store them
 % under corresponding variables names to be used later
@@ -564,14 +609,14 @@ for i = 1:length(random_order)
 
     % Execute the appropriate task function based on the task type
     if strcmp(current_task.task, 'vs')
-        semanticVis(current_task.cat, visSeq1.(current_task.sequence), visLabels1.(current_task.labels),date, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port);  % Call visual semantic function
+        semanticVis(current_task.cat, visSeq1.(current_task.sequence), visLabels1.(current_task.labels),subjectID, ...
+            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
     elseif strcmp(current_task.task, 'as')
-        semanticAud(current_task.cat, audSeq1.(current_task.sequence), audLabels1.(current_task.labels), audioDataDS, fieldAud1, audBlk1, date, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port);  % Call auditory semantic function
+        semanticAud(current_task.cat, audSeq1.(current_task.sequence), audLabels1.(current_task.labels), audioDataDS, fieldAud1, audBlk1, subjectID, ...
+            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
     elseif strcmp(current_task.task, 'ca')
         classicalAud(current_task.sequence, seqAll.caBlk1.Sequences.(current_task.sequence), ...
-            seqAll.caBlk1.Labels.(current_task.labels), date, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port); % Call classical auditory
+            seqAll.caBlk1.Labels.(current_task.labels), subjectID, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
     end
 end
 
@@ -724,13 +769,14 @@ for i = 1:numel(storySeq)
 
 end
 
-dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
+% dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
 
-filename = sprintf('%s_timingData_%s.mat', date, 'story2');
-dirToSave = '../../../TaskTiming/';
-if ~exist("dirToSave", 'dir')
-    mkdir(dirToSave)  
-end
+filename = sprintf('%s_timingData_%s.mat', subjectID, 'story1');
+
+dirToSave = fullfile(dataDir, 'story');
+
+mkdir(dirToSave)  
+
 filename = [dirToSave filename];
 % Save timing data to a .mat file
 save(filename, 'timingData3');
@@ -817,14 +863,14 @@ for i = 1:length(random_order)
 
     % Execute the appropriate task function based on the task type
     if strcmp(current_task.task, 'vs')
-        semanticVis(current_task.cat, visSeq1.(current_task.sequence), visLabels1.(current_task.labels),date, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port);  % Call visual semantic function
+        semanticVis(current_task.cat, visSeq1.(current_task.sequence), visLabels1.(current_task.labels),subjectID, ...
+            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
     elseif strcmp(current_task.task, 'as')
-        semanticAud(current_task.cat, audSeq1.(current_task.sequence), audLabels1.(current_task.labels), audioDataDS, fieldAud1, audBlk1, date, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port);  % Call auditory semantic function
+        semanticAud(current_task.cat, audSeq1.(current_task.sequence), audLabels1.(current_task.labels), audioDataDS, fieldAud1, audBlk1, subjectID, ...
+            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
     elseif strcmp(current_task.task, 'ca')
         classicalAud(current_task.sequence, seqAll.caBlk1.Sequences.(current_task.sequence), ...
-            seqAll.caBlk1.Labels.(current_task.labels), date, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port); % Call classical auditory
+            seqAll.caBlk1.Labels.(current_task.labels), subjectID, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
     end
 end
 
@@ -1100,14 +1146,14 @@ for i = 1:length(random_order)
 
     % Execute the appropriate task function based on the task type
     if strcmp(current_task.task, 'vs')
-        semanticVis(current_task.cat, visSeq2.(current_task.sequence), visLabels2.(current_task.labels),date, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port);  % Call visual semantic function
+        semanticVis(current_task.cat, visSeq2.(current_task.sequence), visLabels2.(current_task.labels),subjectID, ...
+            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
     elseif strcmp(current_task.task, 'as')
-        semanticAud(current_task.cat, audSeq2.(current_task.sequence), audLabels2.(current_task.labels), audioDataDS, fieldAud2, audBlk2, date, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port);  % Call auditory semantic function
+        semanticAud(current_task.cat, audSeq2.(current_task.sequence), audLabels2.(current_task.labels), audioDataDS, fieldAud2, audBlk2, subjectID, ...
+            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
     elseif strcmp(current_task.task, 'ca')
         classicalAud(current_task.sequence, seqAll.caBlk2.Sequences.(current_task.sequence), ...
-            seqAll.caBlk2.Labels.(current_task.labels), date, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port); % Call classical auditory
+            seqAll.caBlk2.Labels.(current_task.labels), subjectID, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
     end
 end
 
@@ -1257,11 +1303,12 @@ end
 
 dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
 
-filename = sprintf('%s_timingData_%s.mat', date, 'story2');
-dirToSave = '../../../TaskTiming/';
-if ~exist("dirToSave", 'dir')
-    mkdir(dirToSave)
-end
+filename = sprintf('%s_timingData_%s.mat', subjectID, 'story2');
+
+dirToSave = fullfile(dataDir, 'story');
+
+mkdir(dirToSave)  
+
 filename = [dirToSave filename];
 % Save timing data to a .mat file
 save(filename, 'timingData3');
@@ -1341,14 +1388,14 @@ for i = 1:length(random_order)
 
     % Execute the appropriate task function based on the task type
     if strcmp(current_task.task, 'vs')
-        semanticVis(current_task.cat, visSeq2.(current_task.sequence), visLabels2.(current_task.labels),date, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port);  % Call visual semantic function
+        semanticVis(current_task.cat, visSeq2.(current_task.sequence), visLabels2.(current_task.labels),subjectID, ...
+            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
     elseif strcmp(current_task.task, 'as')
-        semanticAud(current_task.cat, audSeq2.(current_task.sequence), audLabels2.(current_task.labels), audioDataDS, fieldAud2, audBlk2, date, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port);  % Call auditory semantic function
+        semanticAud(current_task.cat, audSeq2.(current_task.sequence), audLabels2.(current_task.labels), audioDataDS, fieldAud2, audBlk2, subjectID, ...
+            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
     elseif strcmp(current_task.task, 'ca')
         classicalAud(current_task.sequence, seqAll.caBlk2.Sequences.(current_task.sequence), ...
-            seqAll.caBlk2.Labels.(current_task.labels), date, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port); % Call classical auditory
+            seqAll.caBlk2.Labels.(current_task.labels), subjectID, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
     end
 end
 
@@ -1358,11 +1405,10 @@ PsychPortAudio('Close', audioDevice);
 
 %----------------end of Section VI-----------------------------------
 
-filename = sprintf('%s_taskOrder.mat', date);
-dirToSave = '../../../TaskTiming/';
-if ~exist("dirToSave", 'dir')
-    mkdir(dirToSave)
-end
+filename = sprintf('%s_taskOrder.mat', subjectID);
+
+dirToSave = dataDir;
+  
 filename = [dirToSave filename];
 save(filename,'taskNames')
 
@@ -1481,3 +1527,6 @@ Screen('Flip', screen.win);
 
 KbStrokeWait;
 sca;
+
+
+end
