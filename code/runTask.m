@@ -17,7 +17,7 @@
 % video issues is likely due to initscreen, no GStreamer update? needs admin
 % permission
 % must open matlab2020 from search bar
-% change image
+% change image --
 % create control condition
 
 % 02/12/25
@@ -70,14 +70,14 @@
 % subject = numerical value to identify subjects run in the same day (1,
 % 2,...)
 % condition = counterbalancing condition codes (0 or 1)
-function runTask(subject,condition)
+function runTask(subject,ctBalanceCondition)
 
 % Initialize Psychtoolbox and set up the experiment environment
 close all; clc;
 
 % Check if both arguments are missing
 if nargin < 2
-    error('Please enter both subject identifier and condition code (0 or 1).');
+    error('Please enter both subject identifier and ctBalanceCondition code (0 or 1).');
 end
 
 % Validate subject (example: ensure it's non-empty)
@@ -85,9 +85,9 @@ if isempty(subject) || ~isnumeric(subject)
     error('subject must be a number(e.g., 1).');
 end
 
-% Validate ctCondition
-if ~ismember(condition, [0, 1])
-    error('Invalid condition code. Use 0 or 1.');
+% Validate ctctBalanceCondition
+if ~ismember(ctBalanceCondition, [0, 1])
+    error('Invalid ctBalanceCondition code. Use 0 or 1.');
 end
 
 % get the date of the experiment to add to file name later
@@ -99,12 +99,12 @@ subjectID = ['sub_' date '_' num2str(subject)];
 
 % Rest of your experiment code
 disp(['Running experiment for subject: ', subjectID]);
-disp(['Condition: ', num2str(condition)]);
+disp(['ctBalanceCondition: ', num2str(ctBalanceCondition)]);
 
 
 % ---- !! Counterbalancing !! ---- 
 % if 0, run catA, if 1, run catB
-ctCondition = condition;
+ctCondition = ctBalanceCondition;
 
 
 % Check the system running on: currently accepted: syndrome, tmsubuntu
@@ -919,7 +919,7 @@ KbStrokeWait;
 % display image-------------------------------------------------
 
 % Load the image
-imagePath = fullfile(pwd, '../stimulus/images/testimage4k.jpg'); 
+imagePath = fullfile(pwd, '../stimulus/images/boat_sky.jpg'); 
 image = imread(imagePath);
 imageHeight = size(image, 1);
 imageWidth = size(image, 2);
@@ -953,7 +953,7 @@ Screen('Flip', screen.win)
 
 
 % Get the duration for which the video should play (in seconds)
-playDuration = 300; % Change this to desired duration
+playDuration = 300; % 300s, 5 mins
 
 startTime = GetSecs; 
 
