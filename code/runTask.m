@@ -674,10 +674,10 @@ Screen('Flip', screen.win);
 
 % Set the cell array that contains the sequence of audio to be played
 %   (the field name for the cue audio is "Cue")
-% storySeq = {'Marine' 'Main1' 'Medical' 'Main2' 'Trial' 'Main3' 'War' 'Main4'};
+storySeq = {'Marine' 'Main1' 'Medical' 'Main2' 'Trial' 'Main3' 'War' 'Main4'};
 
 % Test latency
-storySeq = {'Cue','Main1'};
+% storySeq = {'Cue','Main1'};
 
 % initialize ds to store timing structure
 timingData3 = struct();
@@ -981,77 +981,77 @@ end
 
 
 
-
-
-% play vid------------------
-
-% Get the duration for which the video should play (in seconds)
-playDuration = 20; % Change this to desired duration
-
-% Get the movie file
-% Define audio device
-if devType == "neither"
-    movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4'); 
-elseif devType == "EEG"
-    movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4');
-end
-
-
-
-% Open the movie file with additional parameters
-async = 1;
-preloadSecs = [];
-specialFlags1 = 0;
-pixelFormat = 4;
-maxNumberThreads = -1;
-movieOptions = [];
-
-movie = Screen('OpenMovie', screen.win, movieFile, async, preloadSecs, specialFlags1, pixelFormat, maxNumberThreads, movieOptions);
-
-WaitSecs(0.5);
-
-% Start playback engine
-Screen('PlayMovie', movie, 1,1); 
-
-% Get the start time
-startTime = GetSecs;
-
-% % Initialize key variables *BEFORE* the loop
-% keyIsDown = false; % Initialize to false (no key pressed initially)
-% keyCode = zeros(1, 256); % Initialize keyCode (size depends on your keyboard)
-
-% Loop the video until the time is up
-while (GetSecs - startTime) < playDuration
-    % Check for new frame
-    tex = Screen('GetMovieImage', screen.win, movie,1);
-
-    % disp('debug')
-    % % Check if 'q' is pressed (case-insensitive)
-    % if keyIsDown
-    %     if strcmpi(KbName(keyCode), 'q') % Compare key pressed with 'q'
-    %         break; % Exit the loop if 'q' is pressed
-    %     end
-    % end
-
-    % If there is a new frame, draw it
-    if tex > 0
-        Screen('DrawTexture', screen.win, tex);
-        Screen('Flip', screen.win);
-        Screen('Close', tex);
-    else
-        WaitSecs(0.001); % Add a small delay if no frame is ready
-    end
-end
-
-
-
-% Stop playback
-Screen('PlayMovie', movie, 0);
-
-% Close the movie
-Screen('CloseMovie', movie);
-% end of vid-----------
-
+% 
+% 
+% % play vid------------------
+% 
+% % Get the duration for which the video should play (in seconds)
+% playDuration = 20; % Change this to desired duration
+% 
+% % Get the movie file
+% % Define audio device
+% if devType == "neither"
+%     movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4'); 
+% elseif devType == "EEG"
+%     movieFile = fullfile(pwd, '../stimulus/videos/galaxy.mp4');
+% end
+% 
+% 
+% 
+% % Open the movie file with additional parameters
+% async = 1;
+% preloadSecs = [];
+% specialFlags1 = 0;
+% pixelFormat = 4;
+% maxNumberThreads = -1;
+% movieOptions = [];
+% 
+% movie = Screen('OpenMovie', screen.win, movieFile, async, preloadSecs, specialFlags1, pixelFormat, maxNumberThreads, movieOptions);
+% 
+% WaitSecs(0.5);
+% 
+% % Start playback engine
+% Screen('PlayMovie', movie, 1,1); 
+% 
+% % Get the start time
+% startTime = GetSecs;
+% 
+% % % Initialize key variables *BEFORE* the loop
+% % keyIsDown = false; % Initialize to false (no key pressed initially)
+% % keyCode = zeros(1, 256); % Initialize keyCode (size depends on your keyboard)
+% 
+% % Loop the video until the time is up
+% while (GetSecs - startTime) < playDuration
+%     % Check for new frame
+%     tex = Screen('GetMovieImage', screen.win, movie,1);
+% 
+%     % disp('debug')
+%     % % Check if 'q' is pressed (case-insensitive)
+%     % if keyIsDown
+%     %     if strcmpi(KbName(keyCode), 'q') % Compare key pressed with 'q'
+%     %         break; % Exit the loop if 'q' is pressed
+%     %     end
+%     % end
+% 
+%     % If there is a new frame, draw it
+%     if tex > 0
+%         Screen('DrawTexture', screen.win, tex);
+%         Screen('Flip', screen.win);
+%         Screen('Close', tex);
+%     else
+%         WaitSecs(0.001); % Add a small delay if no frame is ready
+%     end
+% end
+% 
+% 
+% 
+% % Stop playback
+% Screen('PlayMovie', movie, 0);
+% 
+% % Close the movie
+% Screen('CloseMovie', movie);
+% % end of vid-----------
+% 
 
 
 
