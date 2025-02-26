@@ -5,7 +5,8 @@
 % runs the stimlus sequence for semantic auditory oddball task
 % it takes as arguments
 % cat = the single category (names) for the current stimulus
-% seq = the stimulus sequence based (the names used to call the actual audiodata
+% seq = the stimulus sequence based (the names used to call the actual
+% audiodata)
 % labels = the label sequence
 % data = audioDataDS, the data structure with all audio files
 % fullfield = the fieldnames of the selected categories for this blcck
