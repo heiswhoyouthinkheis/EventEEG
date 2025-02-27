@@ -679,7 +679,7 @@ Screen('Flip', screen.win);
 storySeq = {'Marine' 'Main1' 'Medical' 'Main2' 'Trial' 'Main3' 'War' 'Main4'};
 
 % Test latency
-% storySeq = {'Cue','Main1'};
+% storySeq = {'Marine_edited', 'Main1_edited'};
 
 % initialize ds to store timing structure
 timingData3 = struct();
