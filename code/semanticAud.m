@@ -17,13 +17,21 @@
 % the following arguments are general
 
 function [timingData, taskNames] = semanticAud(cat, seq, labels, data, fullfield, cats, subjectID, ...
-    window, white, allCoords, lineWidthPix, xCenter, yCenter, audioDevice, taskNames, devType, port, dataDir)
+    window, mirror, white, allCoords, lineWidthPix, xCenter, yCenter, audioDevice, taskNames, devType, port, dataDir)
 
 % Draw loading instruction to wait for sequence creation
 line = 'loading ...';
 
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
+
 DrawFormattedText(window, line, 'center', 'center', white);
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 % category name
 category = cat;
@@ -61,6 +69,12 @@ Data4 = append(fullfield{4},"Data");
 % oddData = evalin('base', globalOdd);
 % oddExData = evalin("base", globalOddEx);
 
+disp("semanticAud starting")
+
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
+
 line1 = 'In this task, you will listen to a set of words.';
 line2 = '\n\n Please pay attention to the words read to you, and try to';
 line3 = '\n\n identify the categories the words fall under. Please bear';
@@ -71,9 +85,17 @@ line6 = '\n\n report the categories you identified. Press [space] to continue.';
 % Draw instructions
 DrawFormattedText(window, [line1 line2 line3 line4 line5 line6], 'center', 'center', white);
 
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 KbStrokeWait;
+
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
 
 % Draw fixation cross
 if strcmp(devType, 'EEG')
@@ -83,7 +105,11 @@ elseif strcmp(devType, 'MEG')
 else
     Screen('DrawLines', window, allCoords, lineWidthPix, white, [xCenter yCenter]);
 end
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 % KbStrokeWait;
 
@@ -225,14 +251,22 @@ mkdir(dirToSave)
 filename = fullfile(dirToSave, filename);
 save(filename, 'timingData');
 
-% line1 = 'This is the end of the task. Please put down the categories';
-% line2 = '\n\n you identified from the task. Press [space] to continue when you finish.';
+disp("semanticAud ended")
+
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
+
 line1 = 'This is the end of the task. Please say out loud the categories';
 line2 = '\n\n you identified from the task. Press [space] to continue when you finish.';
 
 DrawFormattedText(window, [line1 line2], 'center', 'center', white);
 
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 KbStrokeWait;
 

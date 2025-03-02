@@ -14,14 +14,29 @@
 % the following arguments are general
 
 function [timingData, taskNames] = semanticVis(cat, seq, labels, ...
-    subjectID, window, white, allCoords, lineWidthPix, xCenter, yCenter, taskNames, devType, port, dataDir)
+    subjectID, window, mirror, white, allCoords, lineWidthPix, xCenter, yCenter, taskNames, devType, port, dataDir)
 
 % Draw loading instruction to wait for sequence creation
 line = 'loading ...';
 
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
+
 DrawFormattedText(window, line, 'center', 'center', white);
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
+
 category = cat;
+
+disp("semanticVis starting")
+
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
 
 line1 = 'In this task, you will be visually presented with a set of words.';
 line2 = '\n\n Please pay attention to the words presented to you, and try to';
@@ -33,9 +48,17 @@ line6 = '\n\n report the categories you identified. Press [space] to continue.';
 % Draw instructions
 DrawFormattedText(window, [line1 line2 line3 line4 line5 line6], 'center', 'center', white);
 
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 KbStrokeWait;
+
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
 
 % Draw fixation cross
 if strcmp(devType, 'EEG')
@@ -45,13 +68,21 @@ elseif strcmp(devType, 'MEG')
 else
     Screen('DrawLines', window, allCoords, lineWidthPix, white, [xCenter yCenter]);
 end
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 WaitSecs(1);
 
 % Empty window
 Screen('FillRect', window, white / 2)
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 WaitSecs(1);
 
@@ -92,6 +123,10 @@ for i = 1:length(seq)
     
     Screen('TextSize', window, 250);
     
+    % Clear both windows before drawing new content
+    Screen('FillRect', window, white/2);
+    Screen('FillRect', mirror, white/2);
+    
     % Draw stimulus
     DrawFormattedText(window, stimulus, 'center', 'center', white);
 
@@ -113,14 +148,22 @@ for i = 1:length(seq)
     end
 
     % Flip to the screen
-    onsetTime = Screen('Flip', window);
+    onsetTime = Screen('Flip', window, [], 1);
+    
+    % Copy the main window to the mirror and flip it
+    Screen('CopyWindow', window, mirror);
+    Screen('Flip', mirror);
 
     % Display word for 1 second and then offset word
     WaitSecs(1);
 
     Screen('FillRect', window, white / 2);
 
-    offsetTime = Screen('Flip', window);
+    offsetTime = Screen('Flip', window, [], 1);
+    
+    % Copy the main window to the mirror and flip it
+    Screen('CopyWindow', window, mirror);
+    Screen('Flip', mirror);
 
 
 
@@ -161,6 +204,12 @@ save(filename, 'timingData');
 
 Screen('TextSize', window, defTextSize);
 
+disp("semanticVis ended")
+
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
+
 % line1 = 'This is the end of the task. Please put down the categories';
 % line2 = '\n\n you identified from the task. Press [space] to continue when you finish.';
 line1 = 'This is the end of the task. Please say out loud the categories';
@@ -168,7 +217,11 @@ line2 = '\n\n you identified from the task. Press [space] to continue when you f
 
 DrawFormattedText(window, [line1 line2], 'center', 'center', white);
 
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 KbStrokeWait;
 

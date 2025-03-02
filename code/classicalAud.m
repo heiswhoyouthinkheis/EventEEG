@@ -19,14 +19,27 @@
 %   specific for classicalAud
 
 function [timingData,taskNames] = classicalAud(cat, seq, labels, ...
-    subjectID, window, white, allCoords, lineWidthPix, xCenter, yCenter, taskNames, devType, port, dataDir)
+    subjectID, window, mirror, white, allCoords, lineWidthPix, xCenter, yCenter, taskNames, devType, port, dataDir)
 
 % Draw loading instruction to wait for sequence creation
 line = 'loading ...';
 
-DrawFormattedText(window, line, 'center', 'center', white);
-Screen('Flip', window);
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
 
+DrawFormattedText(window, line, 'center', 'center', white);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
+
+disp("classicalAud starting")
+
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
 
 % Instructions for the task
 line1 = 'In this task, you will listen to a series of sound.';
@@ -37,9 +50,17 @@ line4 = '\n\n Press [space] to continue.';
 % Draw instructions
 DrawFormattedText(window, [line1 line2 line3 line4], 'center', 'center', white);
 
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 KbStrokeWait;
+
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
 
 % Draw fixation cross
 if strcmp(devType, 'EEG')
@@ -49,7 +70,11 @@ elseif strcmp(devType, 'MEG')
 else
     Screen('DrawLines', window, allCoords, lineWidthPix, white, [xCenter yCenter]);
 end
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 
 % initialize data structure to store timing data
@@ -162,11 +187,21 @@ filename = fullfile(dirToSave, filename);
 
 save(filename, 'timingData');
 
+disp("classicalAud ended")
+
+% Clear both windows before drawing new content
+Screen('FillRect', window, white/2);
+Screen('FillRect', mirror, white/2);
+
 line = 'This task is over. Please press [space] to proceed to the next task.';
 
 DrawFormattedText(window, line, 'center', 'center', white);
 
-Screen('Flip', window);
+Screen('Flip', window, [], 1);
+
+% Copy the main window to the mirror and flip it
+Screen('CopyWindow', window, mirror);
+Screen('Flip', mirror);
 
 KbStrokeWait;
 

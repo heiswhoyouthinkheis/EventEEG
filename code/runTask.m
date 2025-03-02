@@ -144,8 +144,16 @@ elseif strcmp(hostname, 'visioncore01m.psych.nyu.edu')
     parameters.viewingDistance = 55; % check once
     devType = 'EEG';
 end
+
 stimDir = '../stimulus';
+
+% ---------------------Screen names--------------------------------
+% Experiment Window -- screen.win
+% Main Mirroring Window -- screen.mirror
+
 screen = initScreen(parameters, devType);
+
+% ---------------------Screen names--------------------------------
 
 % Set data storage directory
 dataDir = fullfile('../timingData/', subjectID);
@@ -154,7 +162,6 @@ mkdir(dataDir)
 
 disp(['Data storage directory: ', dataDir])
 
-% Screen('Preference', 'SkipSyncTests', 1)
 
 
 
@@ -468,6 +475,10 @@ taskNames = {};
 %--------------------START DISPLAY-----------------------------------
 
 
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
+
 % Instructions
 line = 'Press any key to initiate experiment. This may take a few seconds.';
 
@@ -475,7 +486,12 @@ line = 'Press any key to initiate experiment. This may take a few seconds.';
 DrawFormattedText(screen.win, line, 'center', 'center', screen.white);
 
 % Flip to the screen
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
 
 KbStrokeWait;
 
@@ -595,10 +611,10 @@ task_sequence_blk = [
     struct('task', 'as', 'sequence', seqFieldsA{2}, 'labels', labelsFieldsA{2}, 'cat', fieldAud1{2}), ...
     struct('task', 'as', 'sequence', seqFieldsA{3}, 'labels', labelsFieldsA{3}, 'cat', fieldAud1{3}), ...
     struct('task', 'as', 'sequence', seqFieldsA{4}, 'labels', labelsFieldsA{4}, 'cat', fieldAud1{4}), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{1}, 'labels', labelsFieldsCa{1}, 'cat', seqFieldsCa{1}), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{2}, 'labels', labelsFieldsCa{2}, 'cat', seqFieldsCa{2}), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{3}, 'labels', labelsFieldsCa{3}, 'cat', seqFieldsCa{3}), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{4}, 'labels', labelsFieldsCa{4}, 'cat', seqFieldsCa{4}), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{1}, 'labels', labelsFieldsCa{1}, 'cat', seqFieldsCa{1}), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{2}, 'labels', labelsFieldsCa{2}, 'cat', seqFieldsCa{2}), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{3}, 'labels', labelsFieldsCa{3}, 'cat', seqFieldsCa{3}), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{4}, 'labels', labelsFieldsCa{4}, 'cat', seqFieldsCa{4}), ...
     ];
 disp(4)
 % Randomize the order of tasks and sequences
@@ -612,18 +628,21 @@ for i = 1:length(random_order)
     % Execute the appropriate task function based on the task type
     if strcmp(current_task.task, 'vs')
         semanticVis(current_task.cat, visSeq1.(current_task.sequence), visLabels1.(current_task.labels),subjectID, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
+            screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
     elseif strcmp(current_task.task, 'as')
         semanticAud(current_task.cat, audSeq1.(current_task.sequence), audLabels1.(current_task.labels), audioDataDS, fieldAud1, audBlk1, subjectID, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
+            screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
     elseif strcmp(current_task.task, 'ca')
         classicalAud(current_task.cat, seqAll.caBlk1.Sequences.(current_task.sequence), ...
-            seqAll.caBlk1.Labels.(current_task.labels), subjectID, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
+            seqAll.caBlk1.Labels.(current_task.labels), subjectID, screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
     end
 end
 
 % Clean up
 PsychPortAudio('Close', audioDevice);
+
+disp("End of the block")
+
 
 %------------------end of Section I------------------------------
 
@@ -661,6 +680,10 @@ end
 % Set playback volume to 60%
 PsychPortAudio('Volume', audioDevice, 0.6);
 
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
+
 line1 = 'In the following task, you will listen to a story.';
 line2 = '\n\n Press [space] to continue whenever you are ready.';
 
@@ -668,8 +691,12 @@ line2 = '\n\n Press [space] to continue whenever you are ready.';
 DrawFormattedText(screen.win, [line1 line2], 'center', 'center', screen.white);
 
 % Flip to the screen
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
 
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
 
 
 % PsychPortAudio('FillBuffer', audioDevice, [storyAu']);
@@ -687,6 +714,10 @@ timingData3 = struct();
 % Press any key to continue
 KbStrokeWait;
 
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
+
 % Draw fixation cross
 if strcmp(devType, 'EEG')
     Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter], 2);
@@ -695,7 +726,14 @@ elseif strcmp(devType, 'MEG')
 else
     Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter]);
 end
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
+
+disp("story started");
 
 %--! send trigger ! --
 
@@ -726,6 +764,8 @@ for i = 1:numel(storySeq)
     PsychPortAudio('FillBuffer', audioDevice, audioData');
 
     % write(port, current_code,"uint8");
+    
+    disp(event);
     
     %--! send trigger ! --
 
@@ -771,6 +811,8 @@ for i = 1:numel(storySeq)
 
 end
 
+disp("story ended");
+
 % dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
 
 filename = sprintf('%s_timingData_%s.mat', subjectID, 'story1');
@@ -779,12 +821,15 @@ dirToSave = fullfile(dataDir, 'story');
 
 mkdir(dirToSave)  
 
-filename = [dirToSave filename];
+filename = fullfile(dirToSave, filename);
 % Save timing data to a .mat file
 save(filename, 'timingData3');
 
 % Clean up
 PsychPortAudio('Close', audioDevice);
+
+disp("End of the block")
+
 %------------end of Section II--------------------------------------
 
 
@@ -849,10 +894,10 @@ task_sequence_blk = [
     struct('task', 'as', 'sequence', seqFieldsA{2}, 'labels', labelsFieldsA{2}, 'cat', strcat(fieldAud1{2}, "_b")), ...
     struct('task', 'as', 'sequence', seqFieldsA{3}, 'labels', labelsFieldsA{3}, 'cat', strcat(fieldAud1{3}, "_b")), ...
     struct('task', 'as', 'sequence', seqFieldsA{4}, 'labels', labelsFieldsA{4}, 'cat', strcat(fieldAud1{4}, "_b")), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{1}, 'labels', labelsFieldsCa{1}, 'cat', strcat(seqFieldsCa{1}, "_b")), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{2}, 'labels', labelsFieldsCa{2}, 'cat', strcat(seqFieldsCa{2}, "_b")), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{3}, 'labels', labelsFieldsCa{3}, 'cat', strcat(seqFieldsCa{3}, "_b")), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{4}, 'labels', labelsFieldsCa{4}, 'cat', strcat(seqFieldsCa{4}, "_b")), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{1}, 'labels', labelsFieldsCa{1}, 'cat', strcat(seqFieldsCa{1}, "_b")), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{2}, 'labels', labelsFieldsCa{2}, 'cat', strcat(seqFieldsCa{2}, "_b")), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{3}, 'labels', labelsFieldsCa{3}, 'cat', strcat(seqFieldsCa{3}, "_b")), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{4}, 'labels', labelsFieldsCa{4}, 'cat', strcat(seqFieldsCa{4}, "_b")), ...
     ];
 disp(4)
 % Randomize the order of tasks and sequences
@@ -866,18 +911,21 @@ for i = 1:length(random_order)
     % Execute the appropriate task function based on the task type
     if strcmp(current_task.task, 'vs')
         semanticVis(current_task.cat, visSeq1.(current_task.sequence), visLabels1.(current_task.labels),subjectID, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
+            screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
     elseif strcmp(current_task.task, 'as')
         semanticAud(current_task.cat, audSeq1.(current_task.sequence), audLabels1.(current_task.labels), audioDataDS, fieldAud1, audBlk1, subjectID, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
+            screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
     elseif strcmp(current_task.task, 'ca')
         classicalAud(current_task.cat, seqAll.caBlk1.Sequences.(current_task.sequence), ...
-            seqAll.caBlk1.Labels.(current_task.labels), subjectID, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
+            seqAll.caBlk1.Labels.(current_task.labels), subjectID, screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
     end
 end
 
 % Clean up
 PsychPortAudio('Close', audioDevice);
+
+disp("End of the block")
+
 
 %-----------------end of Section III---------------------------
 
@@ -903,17 +951,29 @@ end
 
 %--! send trigger ! --
 
+disp("rest started")
+
+
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
+
 % Instructions
 line1 = 'Good job! You have completed the first part of the task. Please feel free to take a five-minute break. .';
 line2 = '\n\n During the break, please sit quietly with your eyes remaining open.';
-line3 = '\n\n A video will be played during the break. It will stop after five minutes,'; 
+line3 = '\n\n A painting will be shown during the break. It will disappear after five minutes,'; 
 line4 = '\n\n after which you can resume the to the task. Feel free to press [space] to proceed to the video.';
 
 % Draw instructions
 DrawFormattedText(screen.win, [line1 line2 line3 line4], 'center', 'center', screen.white);
 
 % Flip to the screen
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
 
 KbStrokeWait;
 
@@ -947,6 +1007,10 @@ imageTexture = Screen('MakeTexture', screen.win, image);
 
 % Calculate the destination rectangle for the image
 destinationRect = CenterRectOnPointd([0 0 scaledWidth scaledHeight], screen.screenXpixels/2, screen.screenYpixels/2);
+
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
 
 % Draw the image
 Screen('DrawTexture', screen.win, imageTexture, [], destinationRect);
@@ -1057,7 +1121,9 @@ end
 
 
 
-
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
 
 % Instructions
 line = 'Ready? Press [space] to continue to the second part of the experiment.';
@@ -1066,7 +1132,12 @@ line = 'Ready? Press [space] to continue to the second part of the experiment.';
 DrawFormattedText(screen.win, line, 'center', 'center', screen.white);
 
 % Flip to the screen
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
 
 KbStrokeWait;
 
@@ -1081,6 +1152,8 @@ else
 end
 
 %--! send trigger ! --
+
+disp("rest ended")
 
 %--------------------rest--------------------------------------------
 
@@ -1132,10 +1205,10 @@ task_sequence_blk = [
     struct('task', 'as', 'sequence', seqFieldsA{2}, 'labels', labelsFieldsA{2}, 'cat', fieldAud2{2}), ...
     struct('task', 'as', 'sequence', seqFieldsA{3}, 'labels', labelsFieldsA{3}, 'cat', fieldAud2{3}), ...
     struct('task', 'as', 'sequence', seqFieldsA{4}, 'labels', labelsFieldsA{4}, 'cat', fieldAud2{4}), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{1}, 'labels', labelsFieldsCa{1}, 'cat', seqFieldsCa{1}), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{2}, 'labels', labelsFieldsCa{2}, 'cat', seqFieldsCa{2}), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{3}, 'labels', labelsFieldsCa{3}, 'cat', seqFieldsCa{3}), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{4}, 'labels', labelsFieldsCa{4}, 'cat', seqFieldsCa{4}), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{1}, 'labels', labelsFieldsCa{1}, 'cat', seqFieldsCa{1}), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{2}, 'labels', labelsFieldsCa{2}, 'cat', seqFieldsCa{2}), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{3}, 'labels', labelsFieldsCa{3}, 'cat', seqFieldsCa{3}), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{4}, 'labels', labelsFieldsCa{4}, 'cat', seqFieldsCa{4}), ...
     ];
 disp(4)
 % Randomize the order of tasks and sequences
@@ -1149,18 +1222,21 @@ for i = 1:length(random_order)
     % Execute the appropriate task function based on the task type
     if strcmp(current_task.task, 'vs')
         semanticVis(current_task.cat, visSeq2.(current_task.sequence), visLabels2.(current_task.labels),subjectID, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
+            screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
     elseif strcmp(current_task.task, 'as')
         semanticAud(current_task.cat, audSeq2.(current_task.sequence), audLabels2.(current_task.labels), audioDataDS, fieldAud2, audBlk2, subjectID, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
+            screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
     elseif strcmp(current_task.task, 'ca')
         classicalAud(current_task.cat, seqAll.caBlk2.Sequences.(current_task.sequence), ...
-            seqAll.caBlk2.Labels.(current_task.labels), subjectID, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
+            seqAll.caBlk2.Labels.(current_task.labels), subjectID, screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
     end
 end
 
 % Clean up
 PsychPortAudio('Close', audioDevice);
+
+disp("End of the block")
+
 
 %----------------end of section IV---------------------------------
 
@@ -1188,6 +1264,10 @@ end
 % Set playback volume to 60%
 PsychPortAudio('Volume', audioDevice, 0.6);
 
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
+
 line1 = 'In the following task, you will listen to the story again.';
 line2 = '\n\n Press [space] to continue whenever you are ready.';
 
@@ -1195,7 +1275,12 @@ line2 = '\n\n Press [space] to continue whenever you are ready.';
 DrawFormattedText(screen.win, [line1 line2], 'center', 'center', screen.white);
 
 % Flip to the screen
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
 
 
 
@@ -1219,6 +1304,10 @@ timingData3 = struct();
 % Press any key to continue
 KbStrokeWait;
 
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
+
 % Draw fixation cross
 if strcmp(devType, 'EEG')
     Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter], 2);
@@ -1227,7 +1316,14 @@ elseif strcmp(devType, 'MEG')
 else
     Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter]);
 end
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
+
+disp("story started")
 
 %--! send trigger ! --
 
@@ -1258,6 +1354,8 @@ for i = 1:numel(storySeq)
     PsychPortAudio('FillBuffer', audioDevice, audioData');
 
     % write(port, current_code,"uint8");
+    
+    disp(event)
     
     %--! send trigger ! --
 
@@ -1303,6 +1401,8 @@ for i = 1:numel(storySeq)
 
 end
 
+disp("story ended")
+
 dateStringBlah = datestr(now, 'yyyymmdd_HHMMSS');
 
 filename = sprintf('%s_timingData_%s.mat', subjectID, 'story2');
@@ -1311,12 +1411,15 @@ dirToSave = fullfile(dataDir, 'story');
 
 mkdir(dirToSave)  
 
-filename = [dirToSave filename];
+filename = fullfile(dirToSave, filename)
 % Save timing data to a .mat file
 save(filename, 'timingData3');
 
 % Clean up
 PsychPortAudio('Close', audioDevice);
+
+disp("End of the block")
+
 
 
 %-------------------end of Section V--------------------------
@@ -1374,10 +1477,10 @@ task_sequence_blk = [
     struct('task', 'as', 'sequence', seqFieldsA{2}, 'labels', labelsFieldsA{2}, 'cat', strcat(fieldAud2{2}, "_b")), ...
     struct('task', 'as', 'sequence', seqFieldsA{3}, 'labels', labelsFieldsA{3}, 'cat', strcat(fieldAud2{3}, "_b")), ...
     struct('task', 'as', 'sequence', seqFieldsA{4}, 'labels', labelsFieldsA{4}, 'cat', strcat(fieldAud2{4}, "_b")), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{1}, 'labels', labelsFieldsCa{1}, 'cat', strcat(seqFieldsCa{1}, "_b")), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{2}, 'labels', labelsFieldsCa{2}, 'cat', strcat(seqFieldsCa{2}, "_b")), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{3}, 'labels', labelsFieldsCa{3}, 'cat', strcat(seqFieldsCa{3}, "_b")), ...
-%     struct('task', 'ca', 'sequence', seqFieldsCa{4}, 'labels', labelsFieldsCa{4}, 'cat', strcat(seqFieldsCa{4}, "_b")), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{1}, 'labels', labelsFieldsCa{1}, 'cat', strcat(seqFieldsCa{1}, "_b")), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{2}, 'labels', labelsFieldsCa{2}, 'cat', strcat(seqFieldsCa{2}, "_b")), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{3}, 'labels', labelsFieldsCa{3}, 'cat', strcat(seqFieldsCa{3}, "_b")), ...
+    struct('task', 'ca', 'sequence', seqFieldsCa{4}, 'labels', labelsFieldsCa{4}, 'cat', strcat(seqFieldsCa{4}, "_b")), ...
     ];
 disp(4)
 % Randomize the order of tasks and sequences
@@ -1391,28 +1494,44 @@ for i = 1:length(random_order)
     % Execute the appropriate task function based on the task type
     if strcmp(current_task.task, 'vs')
         semanticVis(current_task.cat, visSeq2.(current_task.sequence), visLabels2.(current_task.labels),subjectID, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
+            screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir);  % Call visual semantic function
     elseif strcmp(current_task.task, 'as')
         semanticAud(current_task.cat, audSeq2.(current_task.sequence), audLabels2.(current_task.labels), audioDataDS, fieldAud2, audBlk2, subjectID, ...
-            screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
+            screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, audioDevice, taskNames, devType, port, dataDir);  % Call auditory semantic function
     elseif strcmp(current_task.task, 'ca')
         classicalAud(current_task.cat, seqAll.caBlk2.Sequences.(current_task.sequence), ...
-            seqAll.caBlk2.Labels.(current_task.labels), subjectID, screen.win, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
+            seqAll.caBlk2.Labels.(current_task.labels), subjectID, screen.win, screen.mirror, screen.white, allCoords, lineWidthPix, screen.xCenter, screen.yCenter, taskNames, devType, port, dataDir); % Call classical auditory
     end
 end
 
 % Clean up
 PsychPortAudio('Close', audioDevice);
 
+disp("End of the block")
+
 
 %----------------end of Section VI-----------------------------------
+
+
+
+
+
+
+
+disp("End of all blocks. Now go in and set up recorder for recall.")
+
+
 
 filename = sprintf('%s_taskOrder.mat', subjectID);
 
 dirToSave = dataDir;
   
-filename = [dirToSave filename];
+filename = fullfile(dirToSave, filename);
 save(filename,'taskNames')
+
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
 
 line1 = 'Great job! You have come to the last part of the experiment.';
 line2 = '\n\n Before we proceed, please wait for the experimenter to set up the equipment for this part.';
@@ -1422,10 +1541,20 @@ line3 = '\n\n Please do not press any key unless instructed by the experimenter.
 DrawFormattedText(screen.win, [line1 line2 line3], 'center', screen.screenYpixels * 0.35, screen.white);
 
 % Flip to the screen
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
+
 
 % Press any key to continue
 KbStrokeWait;
+
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
 
 % Page for accidental pressing.
 line1 = 'BACK UP SLIDE FOR ACCIDENTS!';
@@ -1435,10 +1564,19 @@ line2 = '\n\n DO NOT PROCEED UNLESS INSTRUCTED SO!';
 DrawFormattedText(screen.win, [line1 line2], 'center', screen.screenYpixels * 0.5, screen.white);
 
 % Flip to the screen
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
 
 % Press any key to continue
 KbStrokeWait;
+
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
 
 % Instructions
 line1 = 'In the next section, you will be asked to recall the story verbally in detail.';
@@ -1448,7 +1586,12 @@ line3 = '\n\n The countdown will start in 2 seconds';
 DrawFormattedText(screen.win, [line1 line2 line3], 'center', screen.screenYpixels * 0.35, screen.white);
 
 % Flip to the screen
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
 
 % wait
 WaitSecs(5);
@@ -1478,6 +1621,10 @@ for i = 1:numRects
     
     end
     
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);    
+    
 % Instructions
 line1 = 'In the next section, you will be asked to recall the story verbally in detail';
 line2 = '\n\n You have 15 seconds to prepare. Please start the verbal recall after you hear the "Beep".';
@@ -1485,11 +1632,20 @@ line2 = '\n\n You have 15 seconds to prepare. Please start the verbal recall aft
 % Draw instructions
 DrawFormattedText(screen.win, [line1 line2], 'center', screen.screenYpixels * 0.35, screen.white);
 
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
 
 WaitSecs(1);
 
 end
+
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
 
 % Draw fixation cross
 if strcmp(devType, 'EEG')
@@ -1499,7 +1655,7 @@ elseif strcmp(devType, 'MEG')
 else
     Screen('DrawLines', screen.win, allCoords, lineWidthPix, screen.white, [screen.xCenter, screen.yCenter]);
 end
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
 
 Beeper(2000)
 
@@ -1517,13 +1673,22 @@ end
 
 KbStrokeWait;
 
+% Clear both windows before drawing new content
+Screen('FillRect', screen.win, screen.white/2);
+Screen('FillRect', screen.mirror, screen.white/2);
+
 % Instructions
 line1 = 'You have reached the end of the experiment. Thank you for your participation.';
 
 % Draw instructions
 DrawFormattedText(screen.win, [line1], 'center', screen.screenYpixels * 0.5, screen.white);
 
-Screen('Flip', screen.win);
+Screen('Flip', screen.win, [], 1);
+
+% Copy the exp window to mirroring window and flip
+Screen('CopyWindow', screen.win, screen.mirror);
+
+Screen('Flip', screen.mirror);
 
 
 
