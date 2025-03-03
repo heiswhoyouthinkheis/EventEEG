@@ -1,0 +1,36 @@
+% Opens an audio device with the designated name, etc.
+% deviceName = name of the audio device to be selected e.g. 'Anker
+% SoundCore'
+% outputChannels = the out put channels of the device. For Anker, it is 2
+% sampleRate = sampling rate for the audio device e.g. 44100
+% playbackChannels = the channels that fits the audio files, 1 for oddballs
+% 2 for story
+function audioDevice = initAudioDevice(deviceName, outputChannels, sampleRate, playbackChannels)
+    % Initialize Psychtoolbox Sound
+    InitializePsychSound(1);
+
+    % Get the list of available audio devices
+    deviceList = PsychPortAudio('GetDevices');
+
+    % Initialize variable to store the device ID
+    deviceID = [];
+
+    % Search for the target device
+    for i = 1:length(deviceList)
+        if strcmp(deviceList(i).DeviceName, deviceName) && deviceList(i).NrOutputChannels == outputChannels
+            deviceID = deviceList(i).DeviceIndex;
+            break;
+        end
+    end
+
+    % Check if the device was found
+    if isempty(deviceID)
+        error('Audio Device "%s" not found, please restart Psychtoolbox Sound System.', deviceName);
+    end
+
+    % Open the audio device
+    audioDevice = PsychPortAudio('Open', deviceID, 1, 1, sampleRate, playbackChannels);
+
+    % Display success message
+    fprintf('Audio Device "%s" initialized successfully with ID: %d\n', deviceName, deviceID);
+end

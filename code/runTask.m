@@ -4,6 +4,11 @@
 % (mrugank.dake@nyu.edu)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% [TODO 03/02/25] Fix Keyboard Problem
+% Watch out for Screen Crash/Errors
+% optimized experimenter display
+% Made sure of the audio device
+
 % [TODO 02/12/25] set up as a function so that it can be run from the
 % terminal --
 % counterbalancing argument input  --
@@ -138,7 +143,7 @@ elseif strcmp(hostname, 'visioncore01m.psych.nyu.edu')
     addpath(genpath('/Users/michelmannlab/Documents/BioSemiTrigger'));
     port = init_trigger;
     parameters.isDemoMode = false;
-    Screen('Preference', 'SkipSyncTests', 1)
+    Screen('Preference', 'SkipSyncTests', 0)
     Screen('Preference', 'VisualDebugLevel', 0);
     PsychDefaultSetup(2);
     parameters.viewingDistance = 55; % check once
@@ -286,12 +291,14 @@ lineWidthPix = screen.screenYpixels/270;
 
 %-----------visual display setup end---------------------------------
 
+
+
 % Define audio device
 if devType == "neither"
     audioDevice = PsychPortAudio('Open', [], 1, 1, [],1);
 elseif devType == "EEG"
     FSMan = 24000;
-    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+    audioDevice = initAudioDevice('Anker SoundCore', 2, FSMan, 1);
 end
 % Set playback volume to 60%
 PsychPortAudio('Volume', audioDevice, 0.6);
@@ -674,7 +681,7 @@ if devType == "neither"
     audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
 elseif devType == "EEG"
     FSMan = 44100;
-    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 2);
+    audioDevice = initAudioDevice('Anker SoundCore', 2, FSMan, 2);
 end
 
 % Set playback volume to 60%
@@ -865,7 +872,7 @@ if devType == "neither"
     audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
 elseif devType == "EEG"
     FSMan = 24000;
-    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+    audioDevice = initAudioDevice('Anker SoundCore', 2, FSMan, 1);
 end
 
 % Set playback volume to 60%
@@ -1175,7 +1182,7 @@ if devType == "neither"
     audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
 elseif devType == "EEG"
     FSMan = 24000;
-    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+    audioDevice = initAudioDevice('Anker SoundCore', 2, FSMan, 1);
 end
 % Set playback volume to 60%
 PsychPortAudio('Volume', audioDevice, 0.6);
@@ -1258,7 +1265,7 @@ if devType == "neither"
     audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
 elseif devType == "EEG"
     FSMan = 44100;
-    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 2);
+    audioDevice = initAudioDevice('Anker SoundCore', 2, FSMan, 2);
 end
 
 % Set playback volume to 60%
@@ -1448,7 +1455,7 @@ if devType == "neither"
     audioDevice = PsychPortAudio('Open', [], 1, 1, [],2);
 elseif devType == "EEG"
     FSMan = 24000;
-    audioDevice = PsychPortAudio('Open', [], 1, 1, FSMan, 1);
+    audioDevice = initAudioDevice('Anker SoundCore', 2, FSMan, 1);
 end
 
 % Set playback volume to 60%
