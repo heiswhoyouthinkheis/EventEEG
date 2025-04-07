@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This code is created by Brian Yan (by2139@nyu.edu)
-% And has been adapted for this course by Mrugank Dake
+% And has been adapted for this course (EEG & MEG method) by Mrugank Dake
 % (mrugank.dake@nyu.edu)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
